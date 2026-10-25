@@ -1234,6 +1234,7 @@
           initCharts();
           chartsInitialized = true;
         }
+        updateCharts();
       } else {
         emptyState.style.display = 'block';
         kpiSec.style.display = 'none';
@@ -1663,13 +1664,14 @@
 
         // 1. Update Attack Categories
         if (chartAttacks && data.attack_breakdown) {
-          const labels = Object.keys(data.attack_breakdown);
-          const values = Object.values(data.attack_breakdown);
-          if (labels.length > 0) {
-            chartAttacks.data.labels = labels.map(l => l.toUpperCase());
+          const ab = data.attack_breakdown;
+          const labels = Array.isArray(ab.labels) ? ab.labels : Object.keys(ab);
+          const values = Array.isArray(ab.values) ? ab.values : Object.values(ab);
+          if (labels.length > 0 && values.length > 0) {
+            chartAttacks.data.labels = labels.map(l => String(l).toUpperCase());
             chartAttacks.data.datasets[0].data = values;
             chartAttacks.data.datasets[0].backgroundColor = [
-              '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6', '#f97316'
+              '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6', '#f97316', '#6366f1'
             ];
             chartAttacks.update();
           }
@@ -1677,27 +1679,24 @@
 
         // 2. Update Lifecycle Chart
         if (chartLifecycle && data.lifecycle_distribution) {
-          const lData = data.lifecycle_distribution;
-          chartLifecycle.data.datasets[0].data = [
-            lData['New'] || 0,
-            lData['Investigating'] || 0,
-            lData['Confirmed Incident'] || 0,
-            lData['False Positive'] || 0,
-            lData['Resolved'] || 0
-          ];
-          chartLifecycle.update();
+          const ld = data.lifecycle_distribution;
+          const labels = Array.isArray(ld.labels) ? ld.labels : Object.keys(ld);
+          const values = Array.isArray(ld.values) ? ld.values : Object.values(ld);
+          if (labels.length > 0 && values.length > 0) {
+            chartLifecycle.data.labels = labels;
+            chartLifecycle.data.datasets[0].data = values;
+            chartLifecycle.update();
+          }
         }
 
         // 3. Update Latency Chart
         if (chartLatency && data.performance_telemetry) {
-          const p = data.performance_telemetry;
-          chartLatency.data.datasets[0].data = [
-            p.single_flow_latency_ms?.binary_median || 10.7,
-            p.single_flow_latency_ms?.multiclass_median || 10.9,
-            p.single_flow_latency_ms?.anomaly_median || 30.1,
-            p.single_flow_latency_ms?.xai_median || 14.1
-          ];
-          chartLatency.update();
+          const pt = data.performance_telemetry;
+          if (Array.isArray(pt.labels) && Array.isArray(pt.latencies_ms)) {
+            chartLatency.data.labels = pt.labels;
+            chartLatency.data.datasets[0].data = pt.latencies_ms;
+            chartLatency.update();
+          }
         }
       } catch (err) {
         console.error('Failed to update charts:', err);
