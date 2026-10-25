@@ -1,0 +1,13 @@
+tests/
+reports/
+notebooks/
+data/raw/
+data/processed/
+.pytest_cache/
+*.png
+*.jpg
+!dashboard/static/bg_image.jpg
+*.md
+requirements-dev.txt
+.git
+.gitignore

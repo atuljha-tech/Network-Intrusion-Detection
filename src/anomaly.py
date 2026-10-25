@@ -21,9 +21,14 @@ import time
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+try:
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    MATPLOTLIB_AVAILABLE = True
+except ImportError:
+    plt = None
+    MATPLOTLIB_AVAILABLE = False
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import IsolationForest
@@ -260,6 +265,9 @@ def plot_anomaly_distribution(
     """Plot anomaly score distributions for benign vs malicious traffic."""
     output_path = output_path or (REPORTS_DIR / "anomaly_score_distribution.png")
     output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if not MATPLOTLIB_AVAILABLE or plt is None:
+        return output_path
 
     fig, ax = plt.subplots(figsize=(7, 4.5))
     benign_scores = calibrated_scores[y_test_binary == 0]

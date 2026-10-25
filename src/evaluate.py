@@ -23,10 +23,14 @@ import time
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-import matplotlib
-matplotlib.use("Agg")  # non-interactive backend
-
-import matplotlib.pyplot as plt
+try:
+    import matplotlib
+    matplotlib.use("Agg")  # non-interactive backend
+    import matplotlib.pyplot as plt
+    MATPLOTLIB_AVAILABLE = True
+except ImportError:
+    plt = None
+    MATPLOTLIB_AVAILABLE = False
 import numpy as np
 import pandas as pd
 from sklearn.metrics import (

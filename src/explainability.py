@@ -17,9 +17,14 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+try:
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    MATPLOTLIB_AVAILABLE = True
+except ImportError:
+    plt = None
+    MATPLOTLIB_AVAILABLE = False
 import numpy as np
 import pandas as pd
 from sklearn.pipeline import Pipeline
@@ -121,6 +126,10 @@ def plot_feature_importance(
     """Generate and save a horizontal bar chart of top feature importances."""
     output_path = output_path or (REPORTS_DIR / f"feature_importance_{model_name.lower().replace(' ', '_')}.png")
     output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if not MATPLOTLIB_AVAILABLE or plt is None:
+        log.warning("matplotlib not available; skipping plot generation.")
+        return output_path
 
     plot_df = importance_df.head(top_n).sort_values(by="importance", ascending=True)
 
