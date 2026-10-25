@@ -1,0 +1,41 @@
+======================================================================
+  AI-NIDS Isolation Forest Anomaly Detection Experiment Report
+======================================================================
+CRITICAL NOTICE / DISCLAIMER:
+  DISCLAIMER: Anomaly detection identifies statistical outliers and behavioral deviations from training baselines. Anomaly scores and outlier flags DO NOT represent confirmed malicious attacks. Benign network anomalies (large backups, video streams, network reconfigurations) regularly trigger outlier flags, while stealthy, low-volume attacks may appear normal. Anomaly signals are purely diagnostic candidates for secondary triage and must not be treated as ground-truth attack classifications.
+----------------------------------------------------------------------
+Experimental Setup:
+  Training Mode:         semi_supervised_benign_baseline
+  Training Samples:      2,399
+  Contamination Param:   0.05
+  Number of Trees:       100
+  Fit Time:              0.36 s
+----------------------------------------------------------------------
+Unsupervised Separation Performance:
+  ROC-AUC vs Ground Truth:  0.49428333333333335
+  PR-AUC vs Ground Truth:   0.39388023942759565
+  Overall Outlier Rate:     5.10% (51 / 1,000)
+  Benign False Alarm Rate:  5.67% (34 / 600)
+  Malicious Outlier Rate:   4.25% (17 / 400)
+----------------------------------------------------------------------
+Per-Attack Category Outlier Breakdown:
+  Category                        Total  Flagged     Rate   Mean Score
+  ---------------------------- -------- -------- -------- ------------
+  ddos                               96        3     3.1%       0.4223
+  benign                            600       34     5.7%       0.4276
+  portscan                           29        3    10.3%       0.4325
+  dos slowloris                      21        1     4.8%       0.4353
+  bot                                42        3     7.1%       0.4289
+  dos goldeneye                      46        1     2.2%       0.4214
+  dos hulk                           85        2     2.4%       0.4234
+  ftp-patator                        26        1     3.9%       0.4347
+  dos slowhttptest                   31        3     9.7%       0.4326
+  ssh-patator                        17        0     0.0%       0.4294
+  web attack - brute force            5        0     0.0%       0.4173
+  heartbleed                          2        0     0.0%       0.3615
+----------------------------------------------------------------------
+Operational Guidance:
+  1. Anomaly detection flags statistical anomalies, which frequently include benign novelties.
+  2. Do not automate punitive firewall blocks based purely on anomaly scores.
+  3. Use anomaly scores as priority multipliers during security analyst triage.
+======================================================================

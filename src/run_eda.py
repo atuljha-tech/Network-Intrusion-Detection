@@ -142,8 +142,9 @@ def _generate_synthetic_data(n: int = 1000) -> pd.DataFrame:
     })
 
     # Inject a few NaN and inf values for realism
-    df.loc[rng.choice(n, 5, replace=False), "flow_bytes_s"] = np.nan
-    df.loc[rng.choice(n, 3, replace=False), "flow_packets_s"] = np.inf
+    if n >= 5:
+        df.loc[rng.choice(n, min(5, n), replace=False), "flow_bytes_s"] = np.nan
+        df.loc[rng.choice(n, min(3, n), replace=False), "flow_packets_s"] = np.inf
 
     log.info("Generated synthetic dataset: %d rows × %d cols", len(df), len(df.columns))
     return df

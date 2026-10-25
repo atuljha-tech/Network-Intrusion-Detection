@@ -1,0 +1,117 @@
+{
+  "model_name": "DecisionTree (Multiclass)",
+  "total_training_samples": 4000,
+  "n_classes": 13,
+  "majority_class": "benign",
+  "majority_percentage": 59.975,
+  "minority_class": "infiltration",
+  "minority_percentage": 0.1,
+  "imbalance_ratio": 599.75,
+  "gini_coefficient": 0.6998,
+  "extreme_minority_classes_lt_1pct": [
+    "web attack - brute force",
+    "heartbleed",
+    "infiltration"
+  ],
+  "moderate_minority_classes_1_to_5pct": [
+    "dos goldeneye",
+    "portscan",
+    "dos slowhttptest",
+    "ssh-patator",
+    "ftp-patator",
+    "dos slowloris"
+  ],
+  "class_distribution": [
+    {
+      "class_name": "benign",
+      "count": 2399,
+      "percentage": 59.975,
+      "imbalance_ratio_vs_max": 1.0
+    },
+    {
+      "class_name": "ddos",
+      "count": 402,
+      "percentage": 10.05,
+      "imbalance_ratio_vs_max": 5.97
+    },
+    {
+      "class_name": "dos hulk",
+      "count": 334,
+      "percentage": 8.35,
+      "imbalance_ratio_vs_max": 7.18
+    },
+    {
+      "class_name": "bot",
+      "count": 210,
+      "percentage": 5.25,
+      "imbalance_ratio_vs_max": 11.42
+    },
+    {
+      "class_name": "dos goldeneye",
+      "count": 144,
+      "percentage": 3.5999999999999996,
+      "imbalance_ratio_vs_max": 16.66
+    },
+    {
+      "class_name": "portscan",
+      "count": 133,
+      "percentage": 3.325,
+      "imbalance_ratio_vs_max": 18.04
+    },
+    {
+      "class_name": "dos slowhttptest",
+      "count": 129,
+      "percentage": 3.225,
+      "imbalance_ratio_vs_max": 18.6
+    },
+    {
+      "class_name": "ssh-patator",
+      "count": 71,
+      "percentage": 1.775,
+      "imbalance_ratio_vs_max": 33.79
+    },
+    {
+      "class_name": "ftp-patator",
+      "count": 70,
+      "percentage": 1.7500000000000002,
+      "imbalance_ratio_vs_max": 34.27
+    },
+    {
+      "class_name": "dos slowloris",
+      "count": 69,
+      "percentage": 1.725,
+      "imbalance_ratio_vs_max": 34.77
+    },
+    {
+      "class_name": "web attack - brute force",
+      "count": 20,
+      "percentage": 0.5,
+      "imbalance_ratio_vs_max": 119.95
+    },
+    {
+      "class_name": "heartbleed",
+      "count": 15,
+      "percentage": 0.375,
+      "imbalance_ratio_vs_max": 159.93
+    },
+    {
+      "class_name": "infiltration",
+      "count": 4,
+      "percentage": 0.1,
+      "imbalance_ratio_vs_max": 599.75
+    }
+  ],
+  "macro_f1": 0.06724461859992693,
+  "weighted_f1": 0.3137280118265341,
+  "metric_disparity_weighted_minus_macro": 0.2465,
+  "imbalance_masking_effect": "Severe: Weighted F1 is significantly higher than Macro F1, indicating that majority-class success is concealing low performance on rare attacks.",
+  "support_recall_correlation": 0.9406,
+  "support_f1_correlation": 0.984,
+  "correlation_interpretation": "Positive correlation between class support and recall confirms that attacks with fewer training samples suffer poorer detection rates under standard loss formulations.",
+  "mitigations": [
+    "Incorporate 'balanced' class weights (inverse frequency weighting) in loss calculation.",
+    "Evaluate primarily on Macro F1 and per-class recall rather than weighted metrics or overall accuracy.",
+    "Establish specialized alert routing or threshold tuning for high-risk rare attacks.",
+    "Consider focused synthetic oversampling (SMOTE) or targeted network capture augmentation."
+  ]
+}

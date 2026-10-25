@@ -1,0 +1,42 @@
+======================================================================
+  AI-NIDS Class Imbalance Analysis Report — DecisionTree (Multiclass)
+======================================================================
+Total Samples:       4,000
+Unique Classes:      13
+Majority Class:      benign (59.98%)
+Minority Class:      infiltration (0.10%)
+Imbalance Ratio:     599.8 : 1
+Gini Inequality:     0.6998 (0 = equal, 1 = extreme disparity)
+----------------------------------------------------------------------
+Class Distribution Breakdown:
+  Class Name                      Count  Percent   Ratio vs Max
+  ---------------------------- -------- -------- --------------
+  benign                          2,399   59.98%           1.0x
+  ddos                              402   10.05%           6.0x
+  dos hulk                          334    8.35%           7.2x
+  bot                               210    5.25%          11.4x
+  dos goldeneye                     144    3.60%          16.7x
+  portscan                          133    3.33%          18.0x
+  dos slowhttptest                  129    3.23%          18.6x
+  ssh-patator                        71    1.77%          33.8x
+  ftp-patator                        70    1.75%          34.3x
+  dos slowloris                      69    1.73%          34.8x
+  web attack - brute force           20    0.50%         120.0x
+  heartbleed                         15    0.38%         159.9x
+  infiltration                        4    0.10%         599.8x
+----------------------------------------------------------------------
+Critical Observations on Metric Disparity:
+  Macro F1:          0.0672
+  Weighted F1:       0.3137
+  Disparity (W - M): 0.2465
+  Assessment:        Severe: Weighted F1 is significantly higher than Macro F1, indicating that majority-class success is concealing low performance on rare attacks.
+  Support-Recall r:  0.9406
+  Support-F1 r:      0.9840
+  Assessment:        Positive correlation between class support and recall confirms that attacks with fewer training samples suffer poorer detection rates under standard loss formulations.
+----------------------------------------------------------------------
+Imbalance Mitigation Strategies:
+  • Incorporate 'balanced' class weights (inverse frequency weighting) in loss calculation.
+  • Evaluate primarily on Macro F1 and per-class recall rather than weighted metrics or overall accuracy.
+  • Establish specialized alert routing or threshold tuning for high-risk rare attacks.
+  • Consider focused synthetic oversampling (SMOTE) or targeted network capture augmentation.
+======================================================================

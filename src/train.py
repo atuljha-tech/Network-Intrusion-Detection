@@ -324,6 +324,20 @@ def run_training(
     save_classification_reports(results)
     log.info("Saved model_comparison.csv → %s", REPORTS_DIR / "model_comparison.csv")
 
+    # Save feature importance for tree-based models (Phase 4 Task 7)
+    from src.explainability import save_feature_importance_reports
+    for tree_model_name in ["RandomForest", "DecisionTree"]:
+        if tree_model_name in results:
+            try:
+                save_feature_importance_reports(
+                    results[tree_model_name]["pipeline"],
+                    feature_names=feature_names,
+                    model_name=f"binary_{tree_model_name}",
+                    output_dir=REPORTS_DIR,
+                )
+            except Exception as exc:
+                log.warning("Could not extract feature importance for %s: %s", tree_model_name, exc)
+
     # ── 10. Save best pipeline ──────────────────────────────────────────────
     save_pipeline(results[best_name]["pipeline"])
 
@@ -462,15 +476,61 @@ def _print_summary(results: Dict, best_name: str, data_source: str) -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="AI-NIDS Phase 3: Train binary intrusion detection models",
+        description="AI-NIDS: Train binary, multiclass, and anomaly detection models",
     )
     parser.add_argument(
         "--synthetic",
         action="store_true",
         help="Force synthetic data even if real data is available",
     )
+    parser.add_argument(
+        "--multiclass",
+        action="store_true",
+        help="Train Phase 4 multiclass attack classification models",
+    )
+    parser.add_argument(
+        "--anomaly",
+        action="store_true",
+        help="Run Phase 4 Isolation Forest anomaly detection experiment",
+    )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Run all pipelines: binary training, multiclass training, and anomaly experiment",
+    )
     args = parser.parse_args()
-    run_training(force_synthetic=args.synthetic)
+
+    run_all = args.all or (not args.multiclass and not args.anomaly)
+
+    if run_all or not (args.multiclass or args.anomaly):
+        log.info("Running Phase 3 Binary Classification Pipeline...")
+        run_training(force_synthetic=args.synthetic)
+
+    if args.multiclass or args.all:
+        log.info("Running Phase 4 Multiclass Classification Pipeline...")
+        from src.multiclass import run_multiclass_training
+        run_multiclass_training(force_synthetic=args.synthetic)
+
+    if args.anomaly or args.all:
+        log.info("Running Phase 4 Isolation Forest Anomaly Detection Experiment...")
+        from src.anomaly import run_anomaly_experiment
+        # Load data to split for anomaly experiment
+        from src.train import _resolve_data, prepare_features, split_data
+        from src.feature_engineering import separate_features_target
+        df, _ = _resolve_data(None, force_synthetic=args.synthetic)
+        X, y_bin = separate_features_target(df, target_col=BINARY_TARGET_COLUMN)
+        X, feature_names, _ = prepare_features(X)
+        y_multi = df[ORIGINAL_LABEL_COLUMN] if ORIGINAL_LABEL_COLUMN in df.columns else None
+        X_train, X_test, y_train_bin, y_test_bin = split_data(X, y_bin)
+        y_test_multi = y_multi.loc[y_test_bin.index] if y_multi is not None else None
+        run_anomaly_experiment(
+            X_train,
+            y_train_bin,
+            X_test,
+            y_test_bin,
+            y_test_multiclass=y_test_multi,
+            feature_names=feature_names,
+        )
 
 
 if __name__ == "__main__":

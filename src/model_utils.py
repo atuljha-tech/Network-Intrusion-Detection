@@ -161,4 +161,11 @@ def validate_features(
         )
 
     # Reorder to match training feature order
-    return df[expected_features].copy()
+    out_df = df[expected_features].copy()
+
+    # Ensure all feature columns are numeric, coercing unparseable strings to NaN
+    for col in expected_features:
+        if not pd.api.types.is_numeric_dtype(out_df[col]):
+            out_df[col] = pd.to_numeric(out_df[col], errors="coerce")
+
+    return out_df

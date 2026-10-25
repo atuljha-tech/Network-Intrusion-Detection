@@ -20,10 +20,18 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR        = PROJECT_ROOT / "data"
 RAW_DATA_DIR    = DATA_DIR / "raw"
 PROCESSED_DIR   = DATA_DIR / "processed"
+PCAP_DIR        = DATA_DIR / "pcap"
 REPORTS_DIR     = PROJECT_ROOT / "reports"
 LOGS_DIR        = PROJECT_ROOT / "logs"
 NOTEBOOKS_DIR   = PROJECT_ROOT / "notebooks"
 TESTS_DIR       = PROJECT_ROOT / "tests"
+
+# ---------------------------------------------------------------------------
+# Flow extraction & PCAP options (Phase 5)
+# ---------------------------------------------------------------------------
+FLOW_TIMEOUT_SECONDS          = 120.0  # Max inactive duration before flow expires
+FLOW_ACTIVITY_TIMEOUT_SECONDS = 5.0    # Inactivity gap separating active/idle bursts
+MAX_PACKETS_STREAMING         = 500_000 # Memory guardrail when reading PCAPs
 
 # ---------------------------------------------------------------------------
 # Processed output filenames
@@ -99,17 +107,37 @@ CSV_ENCODING   = "utf-8"       # default; chardet fallback is used automatically
 SUPPORTED_EXTENSIONS = {".csv"}
 
 # ---------------------------------------------------------------------------
-# Model / training outputs  (Phase 3)
+# Model / training outputs  (Phase 3 & Phase 4)
 # ---------------------------------------------------------------------------
-MODELS_DIR          = PROJECT_ROOT / "models"
-MODEL_PIPELINE_PATH = MODELS_DIR / "binary_intrusion_pipeline.joblib"
-MODEL_METADATA_PATH = MODELS_DIR / "model_metadata.json"
+MODELS_DIR               = PROJECT_ROOT / "models"
+MODEL_PIPELINE_PATH      = MODELS_DIR / "binary_intrusion_pipeline.joblib"
+MODEL_METADATA_PATH      = MODELS_DIR / "model_metadata.json"
+MULTICLASS_PIPELINE_PATH = MODELS_DIR / "multiclass_intrusion_pipeline.joblib"
+MULTICLASS_METADATA_PATH = MODELS_DIR / "multiclass_model_metadata.json"
+ANOMALY_MODEL_PATH       = MODELS_DIR / "isolation_forest.joblib"
+ANOMALY_METADATA_PATH    = MODELS_DIR / "anomaly_metadata.json"
 
 # ---------------------------------------------------------------------------
-# Training options  (Phase 3)
+# Alert & Dashboard options (Phase 6)
 # ---------------------------------------------------------------------------
-TEST_SIZE            = 0.2       # fraction of data held out for evaluation
-MIN_RECALL_THRESHOLD = 0.80     # minimum acceptable malicious-class recall
+ALERTS_DB_PATH        = DATA_DIR / "alerts.db"
+ALERT_STATUS_CHOICES  = [
+    "New",
+    "Investigating",
+    "Confirmed Incident",
+    "False Positive",
+    "Resolved",
+]
+DEFAULT_ALERT_STATUS  = "New"
+DASHBOARD_HOST        = "127.0.0.1"
+DASHBOARD_PORT        = 8501
+
+# ---------------------------------------------------------------------------
+# Training options  (Phase 3 & Phase 4)
+# ---------------------------------------------------------------------------
+TEST_SIZE               = 0.2       # fraction of data held out for evaluation
+MIN_RECALL_THRESHOLD    = 0.80     # minimum acceptable malicious-class recall
+ANOMALY_CONTAMINATION   = 0.05     # expected baseline outlier fraction for Isolation Forest
 
 # ---------------------------------------------------------------------------
 # Preprocessing options

@@ -1,0 +1,69 @@
+======================================================================
+ AI-NIDS EXPLORATORY DATA ANALYSIS REPORT
+ Generated: 2026-10-25T22:58:09.250414
+ Data source: synthetic
+======================================================================
+
+── DATASET DIMENSIONS ──
+  Rows:             5,000
+  Columns:          70
+  Feature columns:  66
+  Numeric columns:  67
+  Non-numeric cols: 3
+  Data types:       {'float64': 66, 'object': 3, 'int64': 1}
+
+  Non-numeric column names: ['label', 'original_label', '_source_file']
+
+── DUPLICATE ROWS ──
+  Duplicate rows: 0
+
+── MISSING / INFINITE VALUES ──
+  Columns with issues: 2
+    flow_bytes_s: 5 missing (0.1%), 0 infinite
+    flow_packets_s: 0 missing (0.0%), 3 infinite
+
+── CLASS DISTRIBUTION ──
+  Binary:
+    Benign (class 0): 2,999 (59.98%)
+    Malicious (class 1): 2,001 (40.02%)
+  Multiclass (13 labels):
+    benign: 2,999 (59.98%)
+    ddos: 502 (10.04%)
+    dos hulk: 417 (8.34%)
+    bot: 262 (5.24%)
+    dos goldeneye: 180 (3.6%)
+    portscan: 167 (3.34%)
+    dos slowhttptest: 161 (3.22%)
+    ssh-patator: 89 (1.78%)
+    ftp-patator: 88 (1.76%)
+    dos slowloris: 86 (1.72%)
+    web attack - brute force: 25 (0.5%)
+    heartbleed: 19 (0.38%)
+    infiltration: 5 (0.1%)
+
+── CLASS IMBALANCE ANALYSIS ──
+  Majority class: Benign (2,999 samples, 59.98%)
+  Minority class: Malicious (2,001 samples, 40.02%)
+  Imbalance ratio: 1:1.5
+  
+  Implications for evaluation:
+    • Reasonably balanced — standard metrics are informative.
+    • Still verify per-class recall for rare attack types.
+  
+  Rare attack labels (<100 samples): ['ssh-patator', 'ftp-patator', 'dos slowloris', 'web attack - brute force', 'heartbleed', 'infiltration']
+    • These labels may be too rare for reliable per-class evaluation.
+    • Do NOT remove them from the test set — they represent real attack types.
+    • Consider grouping or stratified sampling during training.
+
+── POTENTIAL LEAKAGE / IDENTIFIER COLUMNS ──
+  potential_identifiers: ['idle_mean', 'idle_std', 'idle_max', 'idle_min']
+  known_non_features: ['_source_file', 'label', 'is_malicious', 'original_label']
+
+── GENERATED PLOTS ──
+  • binary_class_distribution.png
+  • multiclass_distribution.png
+  • missing_values.png
+  • feature_distributions.png
+  • correlation_heatmap.png
+
+======================================================================

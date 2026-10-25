@@ -1,44 +1,70 @@
-# Virtual environment
+# Python virtual environments
 .venv/
 venv/
 env/
+ENV/
 
-# Raw and processed data (large files)
-data/raw/*.csv
-data/processed/*.csv
-data/processed/*.json
-
-# Python caches
+# Python caches and bytecode
 __pycache__/
 *.py[cod]
 *$py.class
 *.pyo
 
-# Distribution / packaging
+# Testing and coverage caches
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Distribution and packaging
 *.egg-info/
 dist/
 build/
+*.egg
 
-# IDE settings
+# IDE and editor settings
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# OS files
-Thumbs.db
+# Operating System files
 .DS_Store
+Thumbs.db
+ehthumbs.db
 
-# Logs (keep directory but not contents)
+# SQLite Databases
+*.db
+data/*.db
+data/alerts.db
+
+# Runtime logs
 logs/*.log
 
-# Reports (generated, can be regenerated)
-reports/*.txt
-reports/*.json
+# Profiler output
+*.prof
 
-# Jupyter checkpoints
-.ipynb_checkpoints/
+# Large raw datasets (downloaded separately)
+data/raw/*.csv
+data/processed/*.csv
+data/processed/*.json
 
-# Environment secrets
+# Network packet captures (protect privacy; retain only bundled synthetic fixture)
+data/pcap/*.pcap
+data/pcap/*.pcapng
+data/pcap/*.cap
+!data/pcap/sample_network_traffic.pcap
+
+# Temporary files
+*.tmp
+/tmp/uploaded_*
+tmp/
+reports/sanitized_soc_alerts_*.csv
+
+# Environment secrets and credentials
 .env
 *.env
+*.pem
+*.key

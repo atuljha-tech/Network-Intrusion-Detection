@@ -41,7 +41,7 @@ def _good_df(n: int = 4) -> pd.DataFrame:
         ORIGINAL_LABEL_COLUMN: ["benign", "bot"] * (n // 2),
         LABEL_COLUMN: ["benign", "bot"] * (n // 2),
         SOURCE_FILE_COLUMN: ["test.csv"] * n,
-        "feature_a": list(range(n)),
+        "feature_a": [float(x) for x in range(n)],
         "feature_b": [float(x) for x in range(n)],
     })
 

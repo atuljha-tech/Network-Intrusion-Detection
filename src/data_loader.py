@@ -18,7 +18,13 @@ import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-import chardet
+try:
+    import chardet
+except ImportError:
+    try:
+        import charset_normalizer as chardet  # type: ignore
+    except ImportError:
+        chardet = None  # type: ignore
 import numpy as np
 import pandas as pd
 
@@ -45,7 +51,9 @@ def _normalize_column_name(col: str) -> str:
 
 
 def _detect_encoding(filepath: Path, sample_bytes: int = 100_000) -> str:
-    """Use chardet to guess encoding if UTF-8 fails."""
+    """Use chardet or charset_normalizer to guess encoding if UTF-8 fails."""
+    if chardet is None:
+        return CSV_ENCODING
     with open(filepath, "rb") as f:
         raw = f.read(sample_bytes)
     result = chardet.detect(raw)

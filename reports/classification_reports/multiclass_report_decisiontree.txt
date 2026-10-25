@@ -1,0 +1,19 @@
+                          precision    recall  f1-score   support
+
+                  benign       0.65      0.38      0.48       600
+                     bot       0.06      0.12      0.07        52
+                    ddos       0.16      0.14      0.15       100
+           dos goldeneye       0.02      0.03      0.02        36
+                dos hulk       0.06      0.07      0.07        83
+        dos slowhttptest       0.03      0.09      0.04        32
+           dos slowloris       0.02      0.06      0.03        17
+             ftp-patator       0.00      0.00      0.00        18
+              heartbleed       0.00      0.00      0.00         4
+            infiltration       0.00      0.00      0.00         1
+                portscan       0.01      0.03      0.02        34
+             ssh-patator       0.00      0.00      0.00        18
+web attack - brute force       0.00      0.00      0.00         5
+
+                accuracy                           0.26      1000
+               macro avg       0.08      0.07      0.07      1000
+            weighted avg       0.42      0.26      0.31      1000

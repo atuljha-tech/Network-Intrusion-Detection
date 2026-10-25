@@ -1,0 +1,183 @@
+{
+  "data_source": "synthetic",
+  "generated_at": "2026-10-25T22:58:09.252456",
+  "dataset_info": {
+    "n_rows": 5000,
+    "n_cols": 70,
+    "dtypes": {
+      "float64": 66,
+      "object": 3,
+      "int64": 1
+    },
+    "numeric_columns": 67,
+    "non_numeric_columns": 3,
+    "non_numeric_names": [
+      "label",
+      "original_label",
+      "_source_file"
+    ],
+    "feature_columns": 66,
+    "columns": [
+      "label",
+      "original_label",
+      "is_malicious",
+      "_source_file",
+      "flow_duration",
+      "total_fwd_packets",
+      "total_backward_packets",
+      "total_length_of_fwd_packets",
+      "total_length_of_bwd_packets",
+      "fwd_packet_length_max",
+      "fwd_packet_length_min",
+      "fwd_packet_length_mean",
+      "fwd_packet_length_std",
+      "bwd_packet_length_max",
+      "bwd_packet_length_min",
+      "bwd_packet_length_mean",
+      "bwd_packet_length_std",
+      "flow_bytes_s",
+      "flow_packets_s",
+      "flow_iat_mean",
+      "flow_iat_std",
+      "flow_iat_max",
+      "flow_iat_min",
+      "fwd_iat_total",
+      "fwd_iat_mean",
+      "fwd_iat_std",
+      "fwd_iat_max",
+      "fwd_iat_min",
+      "bwd_iat_total",
+      "bwd_iat_mean",
+      "bwd_iat_std",
+      "bwd_iat_max",
+      "bwd_iat_min",
+      "fwd_psh_flags",
+      "bwd_psh_flags",
+      "fwd_urg_flags",
+      "bwd_urg_flags",
+      "fwd_header_length",
+      "bwd_header_length",
+      "fwd_packets_s",
+      "bwd_packets_s",
+      "min_packet_length",
+      "max_packet_length",
+      "packet_length_mean",
+      "packet_length_std",
+      "packet_length_variance",
+      "fin_flag_count",
+      "syn_flag_count",
+      "rst_flag_count",
+      "psh_flag_count",
+      "ack_flag_count",
+      "urg_flag_count",
+      "cwe_flag_count",
+      "ece_flag_count",
+      "down_up_ratio",
+      "average_packet_size",
+      "avg_fwd_segment_size",
+      "avg_bwd_segment_size",
+      "init_win_bytes_forward",
+      "init_win_bytes_backward",
+      "act_data_pkt_fwd",
+      "min_seg_size_forward",
+      "active_mean",
+      "active_std",
+      "active_max",
+      "active_min",
+      "idle_mean",
+      "idle_std",
+      "idle_max",
+      "idle_min"
+    ]
+  },
+  "missing_values": [
+    {
+      "column": "flow_bytes_s",
+      "missing": 5,
+      "infinite": 0,
+      "missing_pct": 0.1
+    },
+    {
+      "column": "flow_packets_s",
+      "missing": 0,
+      "infinite": 3,
+      "missing_pct": 0.0
+    }
+  ],
+  "class_distribution": {
+    "binary": {
+      "counts": {
+        "0": 2999,
+        "1": 2001
+      },
+      "percentages": {
+        "0": 59.98,
+        "1": 40.02
+      }
+    },
+    "multiclass": {
+      "counts": {
+        "benign": 2999,
+        "ddos": 502,
+        "dos hulk": 417,
+        "bot": 262,
+        "dos goldeneye": 180,
+        "portscan": 167,
+        "dos slowhttptest": 161,
+        "ssh-patator": 89,
+        "ftp-patator": 88,
+        "dos slowloris": 86,
+        "web attack - brute force": 25,
+        "heartbleed": 19,
+        "infiltration": 5
+      },
+      "percentages": {
+        "benign": 59.98,
+        "ddos": 10.04,
+        "dos hulk": 8.34,
+        "bot": 5.24,
+        "dos goldeneye": 3.6,
+        "portscan": 3.34,
+        "dos slowhttptest": 3.22,
+        "ssh-patator": 1.78,
+        "ftp-patator": 1.76,
+        "dos slowloris": 1.72,
+        "web attack - brute force": 0.5,
+        "heartbleed": 0.38,
+        "infiltration": 0.1
+      },
+      "n_classes": 13
+    }
+  },
+  "duplicate_rows": 0,
+  "suspicious_columns": {
+    "potential_timestamps": [],
+    "potential_identifiers": [
+      "idle_mean",
+      "idle_std",
+      "idle_max",
+      "idle_min"
+    ],
+    "high_cardinality": [],
+    "known_non_features": [
+      "_source_file",
+      "label",
+      "is_malicious",
+      "original_label"
+    ]
+  },
+  "imbalance_analysis": [
+    "Majority class: Benign (2,999 samples, 59.98%)",
+    "Minority class: Malicious (2,001 samples, 40.02%)",
+    "Imbalance ratio: 1:1.5",
+    "",
+    "Implications for evaluation:",
+    "  \u2022 Reasonably balanced \u2014 standard metrics are informative.",
+    "  \u2022 Still verify per-class recall for rare attack types.",
+    "",
+    "Rare attack labels (<100 samples): ['ssh-patator', 'ftp-patator', 'dos slowloris', 'web attack - brute force', 'heartbleed', 'infiltration']",
+    "  \u2022 These labels may be too rare for reliable per-class evaluation.",
+    "  \u2022 Do NOT remove them from the test set \u2014 they represent real attack types.",
+    "  \u2022 Consider grouping or stratified sampling during training."
+  ]
+}

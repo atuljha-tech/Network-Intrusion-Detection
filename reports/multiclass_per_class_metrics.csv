@@ -1,0 +1,40 @@
+model,class_name,precision,recall,f1,support
+RandomForest,benign,0.6,1.0,0.75,600
+RandomForest,bot,0.0,0.0,0.0,52
+RandomForest,ddos,0.0,0.0,0.0,100
+RandomForest,dos goldeneye,0.0,0.0,0.0,36
+RandomForest,dos hulk,0.0,0.0,0.0,83
+RandomForest,dos slowhttptest,0.0,0.0,0.0,32
+RandomForest,dos slowloris,0.0,0.0,0.0,17
+RandomForest,ftp-patator,0.0,0.0,0.0,18
+RandomForest,heartbleed,0.0,0.0,0.0,4
+RandomForest,infiltration,0.0,0.0,0.0,1
+RandomForest,portscan,0.0,0.0,0.0,34
+RandomForest,ssh-patator,0.0,0.0,0.0,18
+RandomForest,web attack - brute force,0.0,0.0,0.0,5
+DecisionTree,benign,0.6512968299711815,0.37666666666666665,0.47729672650475186,600
+DecisionTree,bot,0.05504587155963303,0.11538461538461539,0.07453416149068323,52
+DecisionTree,ddos,0.1590909090909091,0.14,0.14893617021276595,100
+DecisionTree,dos goldeneye,0.018518518518518517,0.027777777777777776,0.022222222222222223,36
+DecisionTree,dos hulk,0.0594059405940594,0.07228915662650602,0.06521739130434782,83
+DecisionTree,dos slowhttptest,0.026785714285714284,0.09375,0.041666666666666664,32
+DecisionTree,dos slowloris,0.01818181818181818,0.058823529411764705,0.027777777777777776,17
+DecisionTree,ftp-patator,0.0,0.0,0.0,18
+DecisionTree,heartbleed,0.0,0.0,0.0,4
+DecisionTree,infiltration,0.0,0.0,0.0,1
+DecisionTree,portscan,0.011494252873563218,0.029411764705882353,0.01652892561983471,34
+DecisionTree,ssh-patator,0.0,0.0,0.0,18
+DecisionTree,web attack - brute force,0.0,0.0,0.0,5
+LogisticRegression,benign,0.38461538461538464,0.008333333333333333,0.01631321370309951,600
+LogisticRegression,bot,0.06172839506172839,0.09615384615384616,0.07518796992481203,52
+LogisticRegression,ddos,0.18867924528301888,0.1,0.13071895424836602,100
+LogisticRegression,dos goldeneye,0.036585365853658534,0.08333333333333333,0.05084745762711865,36
+LogisticRegression,dos hulk,0.09302325581395349,0.0963855421686747,0.09467455621301775,83
+LogisticRegression,dos slowhttptest,0.010309278350515464,0.03125,0.015503875968992248,32
+LogisticRegression,dos slowloris,0.0,0.0,0.0,17
+LogisticRegression,ftp-patator,0.019230769230769232,0.1111111111111111,0.03278688524590164,18
+LogisticRegression,heartbleed,0.0,0.0,0.0,4
+LogisticRegression,infiltration,0.0,0.0,0.0,1
+LogisticRegression,portscan,0.01834862385321101,0.058823529411764705,0.027972027972027972,34
+LogisticRegression,ssh-patator,0.045454545454545456,0.2777777777777778,0.078125,18
+LogisticRegression,web attack - brute force,0.0,0.0,0.0,5
