@@ -43,6 +43,7 @@ from src.alert_manager import AlertManager
 from src.config import (
     ALERT_STATUS_CHOICES,
     ALERTS_DB_PATH,
+    DATA_DIR,
     DEFAULT_ALERT_STATUS,
     MODELS_DIR,
     PCAP_DIR,
@@ -535,6 +536,20 @@ def export_alerts_csv():
         str(res_file),
         as_attachment=True,
         download_name=res_file.name,
+        mimetype="text/csv",
+    )
+
+
+@app.route("/api/download/sample-csv", methods=["GET"])
+def download_sample_csv():
+    """Download a verified 66-feature sample CSV datasheet for testing."""
+    sample_path = DATA_DIR / "sample_features.csv"
+    if not sample_path.exists():
+        return jsonify({"error": "Sample datasheet not found."}), 404
+    return send_file(
+        str(sample_path),
+        as_attachment=True,
+        download_name="sample_network_flows.csv",
         mimetype="text/csv",
     )
 

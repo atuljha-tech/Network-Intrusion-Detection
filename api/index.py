@@ -15,3 +15,4 @@ from dashboard.server import app
 
 # Vercel WSGI / ASGI interface
 app = app
+

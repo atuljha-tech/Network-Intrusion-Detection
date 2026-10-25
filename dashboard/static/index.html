@@ -838,14 +838,6 @@
   <header class="nav-bar">
     <div class="nav-brand">
       <span class="brand-title">AI-NIDS // CONSOLE</span>
-      <div class="system-status">
-        <span class="dot-indicator"></span>
-        <span>System Active</span>
-      </div>
-    </div>
-
-    <div class="nav-actions">
-      <button class="btn-outline" onclick="toggleTheme()" id="theme-btn">Light Theme</button>
     </div>
   </header>
 
@@ -879,7 +871,7 @@
         <div id="dropzone-csv" class="dropzone" onclick="document.getElementById('csv-file-input').click()">
           <input type="file" id="csv-file-input" accept=".csv" style="display: none;" onchange="handleFileSelect(event, 'csv')">
           <div class="dropzone-label">Drop 66-Feature CSV Here or Click to Browse</div>
-          <div class="dropzone-sub">Requires numeric flow features matching CIC-IDS2017 schema. Target columns are safely detached.</div>
+          <div class="dropzone-sub">Requires numeric flow features matching CIC-IDS2017 schema. <a href="/api/download/sample-csv" download="sample_network_flows.csv" style="color: var(--accent-blue); text-decoration: underline;" onclick="event.stopPropagation();">Download sample datasheet (.csv)</a> to test upload.</div>
           <div id="csv-file-name" class="font-mono" style="color: var(--accent-blue); font-size: 12px; margin-top: 6px;"></div>
         </div>
 
@@ -894,6 +886,7 @@
         <!-- Controls & Sample Loaders -->
         <div class="controls-bar">
           <div class="options-group">
+            <a href="/api/download/sample-csv" download="sample_network_flows.csv" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center;">Download Sample Datasheet</a>
             <button class="btn-secondary" onclick="loadSampleCSV()">Load Sample CSV</button>
             <button class="btn-secondary" onclick="loadSamplePCAP()">Load Sample PCAP</button>
             
@@ -1177,7 +1170,8 @@
     function toggleTheme() {
       const isDark = document.documentElement.classList.toggle('dark');
       document.documentElement.classList.toggle('light', !isDark);
-      document.getElementById('theme-btn').textContent = isDark ? 'Light Theme' : 'Dark Theme';
+      const btn = document.getElementById('theme-btn');
+      if (btn) btn.textContent = isDark ? 'Light Theme' : 'Dark Theme';
       if (chartsInitialized) {
         initCharts();
         updateCharts();

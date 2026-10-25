@@ -150,3 +150,13 @@ def test_server_export_sanitized_csv(client):
     assert b"payload" not in res.data
     assert b"raw_payload" not in res.data
 
+
+def test_server_download_sample_csv(client):
+    """Test that GET /api/download/sample-csv serves verified sample features datasheet."""
+    res = client.get("/api/download/sample-csv")
+    assert res.status_code == 200
+    assert res.mimetype == "text/csv"
+    assert b"flow_duration" in res.data
+    assert b"total_fwd_packets" in res.data
+
+
