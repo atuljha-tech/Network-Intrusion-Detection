@@ -21,8 +21,8 @@ DATA_DIR        = PROJECT_ROOT / "data"
 RAW_DATA_DIR    = DATA_DIR / "raw"
 PROCESSED_DIR   = DATA_DIR / "processed"
 PCAP_DIR        = DATA_DIR / "pcap"
-REPORTS_DIR     = PROJECT_ROOT / "reports"
-LOGS_DIR        = PROJECT_ROOT / "logs"
+REPORTS_DIR     = Path("/tmp/reports") if os.environ.get("VERCEL") else (PROJECT_ROOT / "reports")
+LOGS_DIR        = Path("/tmp/logs") if os.environ.get("VERCEL") else (PROJECT_ROOT / "logs")
 NOTEBOOKS_DIR   = PROJECT_ROOT / "notebooks"
 TESTS_DIR       = PROJECT_ROOT / "tests"
 
@@ -120,7 +120,7 @@ ANOMALY_METADATA_PATH    = MODELS_DIR / "anomaly_metadata.json"
 # ---------------------------------------------------------------------------
 # Alert & Dashboard options (Phase 6)
 # ---------------------------------------------------------------------------
-ALERTS_DB_PATH        = DATA_DIR / "alerts.db"
+ALERTS_DB_PATH        = Path("/tmp/alerts.db") if os.environ.get("VERCEL") else (DATA_DIR / "alerts.db")
 ALERT_STATUS_CHOICES  = [
     "New",
     "Investigating",

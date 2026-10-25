@@ -106,24 +106,28 @@ def test_server_ingest_sample_pcap(client):
 
 def test_server_update_status_lifecycle(client):
     """Test that updating an alert status succeeds and validates choices."""
-    # Fetch an existing alert ID
+    # Ensure at least one alert exists for testing
     r_alerts = client.get("/api/alerts?limit=1")
     alerts = r_alerts.get_json()["alerts"]
-    if alerts:
-        aid = alerts[0]["id"]
-        res = client.post(
-            f"/api/alerts/{aid}/status",
-            json={"status": "Investigating", "analyst_notes": "Reviewed by test suite."},
-        )
-        assert res.status_code == 200
-        assert res.get_json()["alert"]["status"] == "Investigating"
+    if not alerts:
+        client.post("/api/ingest/sample-csv", data={"model_type": "multiclass"})
+        r_alerts = client.get("/api/alerts?limit=1")
+        alerts = r_alerts.get_json()["alerts"]
+    assert len(alerts) > 0
+    aid = alerts[0]["id"]
+    res = client.post(
+        f"/api/alerts/{aid}/status",
+        json={"status": "Investigating", "analyst_notes": "Reviewed by test suite."},
+    )
+    assert res.status_code == 200
+    assert res.get_json()["alert"]["status"] == "Investigating"
 
-        # Invalid status should return 400
-        res_bad = client.post(
-            f"/api/alerts/{aid}/status",
-            json={"status": "NonExistentStatusXYZ"},
-        )
-        assert res_bad.status_code == 400
+    # Invalid status should return 400
+    res_bad = client.post(
+        f"/api/alerts/{aid}/status",
+        json={"status": "NonExistentStatusXYZ"},
+    )
+    assert res_bad.status_code == 400
 
 
 def test_server_invalid_csv_schema_rejected(client):
