@@ -113,9 +113,18 @@ def add_cors_headers(response):
 # ── Web Routes & Endpoints ────────────────────────────────────────────────────
 
 @app.route("/", methods=["GET"])
+@app.route("/index.html", methods=["GET"])
+@app.route("/api/index", methods=["GET"])
+@app.route("/api/index.py", methods=["GET"])
 def index():
     """Serve the single-page dashboard HTML application."""
     return send_from_directory(str(STATIC_DIR), "index.html")
+
+
+@app.route("/static/<path:filename>", methods=["GET"])
+def serve_static(filename):
+    """Explicitly serve static assets for Vercel and local hosting."""
+    return send_from_directory(str(STATIC_DIR), filename)
 
 
 @app.route("/api/health", methods=["GET"])
