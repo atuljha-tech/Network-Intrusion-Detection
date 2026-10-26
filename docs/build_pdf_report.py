@@ -629,3 +629,4 @@ def create_pdf(output_path: str):
 if __name__ == "__main__":
     out_pdf = str(Path(__file__).resolve().parent / "AI_NIDS_Complete_PRD_and_Architecture.pdf")
     create_pdf(out_pdf)
+
