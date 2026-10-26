@@ -55,6 +55,39 @@ def get_package_versions() -> Dict[str, str]:
     return versions
 
 
+# ── sklearn version compatibility ───────────────────────────────────────────
+
+def patch_sklearn_compatibility(estimator):
+    """Ensure backward and forward compatibility across scikit-learn versions.
+
+    Specifically addresses scikit-learn >= 1.6.0 expecting `_fill_dtype` on
+    deserialized `SimpleImputer` instances fitted on scikit-learn < 1.6.0,
+    as well as recursively patching steps in Pipelines and ColumnTransformers.
+    """
+    if estimator is None:
+        return estimator
+
+    # Recursively check Pipeline steps list [(name, step), ...]
+    if hasattr(estimator, "steps") and isinstance(estimator.steps, (list, tuple)):
+        for _, step in estimator.steps:
+            patch_sklearn_compatibility(step)
+
+    # Recursively check named_steps dict
+    if hasattr(estimator, "named_steps") and isinstance(estimator.named_steps, dict):
+        for step in estimator.named_steps.values():
+            patch_sklearn_compatibility(step)
+
+    # Patch SimpleImputer missing _fill_dtype
+    if hasattr(estimator, "statistics_") and not hasattr(estimator, "_fill_dtype"):
+        try:
+            import numpy as np
+            estimator._fill_dtype = getattr(estimator.statistics_, "dtype", np.float64)
+        except Exception:
+            pass
+
+    return estimator
+
+
 # ── pipeline persistence ────────────────────────────────────────────────────
 
 def save_pipeline(pipeline, path: Optional[Path] = None) -> Path:
@@ -64,6 +97,7 @@ def save_pipeline(pipeline, path: Optional[Path] = None) -> Path:
     """
     path = path or MODEL_PIPELINE_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
+    pipeline = patch_sklearn_compatibility(pipeline)
     joblib.dump(pipeline, path)
     log.info("Saved pipeline → %s", path)
     return path
@@ -84,6 +118,7 @@ def load_pipeline(path: Optional[Path] = None):
     if not path.exists():
         raise FileNotFoundError(f"Model pipeline not found: {path}")
     pipeline = joblib.load(path)
+    pipeline = patch_sklearn_compatibility(pipeline)
     log.info("Loaded pipeline from %s", path)
     return pipeline
 

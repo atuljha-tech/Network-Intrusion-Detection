@@ -32,7 +32,12 @@ from src.config import (
     setup_logging,
 )
 from src.explainability import FlowExplainer
-from src.model_utils import load_metadata, load_pipeline, validate_features
+from src.model_utils import (
+    load_metadata,
+    load_pipeline,
+    patch_sklearn_compatibility,
+    validate_features,
+)
 
 logger = setup_logging()
 log = logging.getLogger("ai_nids.predict")
@@ -83,6 +88,11 @@ def predict(
     """
     if pipeline is None:
         pipeline = load_pipeline(pipeline_path or MODEL_PIPELINE_PATH)
+    else:
+        pipeline = patch_sklearn_compatibility(pipeline)
+
+    if anomaly_pipeline is not None:
+        anomaly_pipeline = patch_sklearn_compatibility(anomaly_pipeline)
     if metadata is None:
         metadata = load_metadata(metadata_path or MODEL_METADATA_PATH)
 
