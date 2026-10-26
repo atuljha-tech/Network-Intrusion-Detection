@@ -1377,17 +1377,23 @@
 
       try {
         const res = await fetch('/api/ingest/sample-csv', { method: 'POST', body: formData });
-        const data = await res.json();
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error(`Server returned HTTP ${res.status}: ${text.slice(0, 120)}`);
+        }
         if (data.success) {
           feedback.innerHTML = `Successfully evaluated ${data.rows_evaluated} flows in ${data.processing_time_seconds}s (${data.avg_latency_ms} ms/flow). Recorded ${data.alerts_registered} alert(s).`;
           updateVisibility(true);
           await loadStats();
           showToast(`Ingested ${data.rows_evaluated} flows from sample CSV`);
         } else {
-          feedback.textContent = `Error: ${data.detail || 'Inference execution failed.'}`;
+          feedback.textContent = `Error: ${data.detail || data.error || data.message || 'Inference execution failed.'}`;
         }
       } catch (err) {
-        feedback.textContent = `Error: ${err}`;
+        feedback.textContent = `Error: ${err.message || err}`;
       }
     }
 
@@ -1403,7 +1409,13 @@
 
       try {
         const res = await fetch('/api/ingest/sample-pcap', { method: 'POST', body: formData });
-        const data = await res.json();
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error(`Server returned HTTP ${res.status}: ${text.slice(0, 120)}`);
+        }
         if (data.success) {
           const telem = data.telemetry || {};
           feedback.innerHTML = `Successfully parsed ${telem.packets_read || 0} packets into ${telem.flows_reconstructed || 0} flows in ${telem.total_time_seconds || 0}s. Recorded ${data.alerts_registered} alerts.`;
@@ -1411,10 +1423,10 @@
           await loadStats();
           showToast(`Ingested PCAP packet trace: ${telem.flows_reconstructed || 0} flows reconstructed`);
         } else {
-          feedback.textContent = `Error: ${data.detail || 'PCAP execution failed.'}`;
+          feedback.textContent = `Error: ${data.detail || data.error || data.message || 'PCAP execution failed.'}`;
         }
       } catch (err) {
-        feedback.textContent = `Error: ${err}`;
+        feedback.textContent = `Error: ${err.message || err}`;
       }
     }
 
@@ -1442,19 +1454,26 @@
 
       try {
         const res = await fetch(endpoint, { method: 'POST', body: formData });
-        const data = await res.json();
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error(`Server returned HTTP ${res.status}: ${text.slice(0, 120)}`);
+        }
         if (res.ok && data.success) {
           feedback.innerHTML = `Analysis complete: Registered ${data.alerts_registered} threat alert(s) into database.`;
           updateVisibility(true);
           await loadStats();
           showToast(`Analysis complete: ${data.alerts_registered} alerts registered`);
         } else {
-          const errDetail = typeof data.detail === 'object' ? JSON.stringify(data.detail) : (data.detail || data.error || 'Failed');
+          const errMsg = data.message ? `${data.error}: ${data.message}` : (data.detail || data.error || 'Failed');
+          const errDetail = typeof errMsg === 'object' ? JSON.stringify(errMsg) : errMsg;
           feedback.textContent = `Error: ${errDetail}`;
           showToast('Ingestion error encountered');
         }
       } catch (err) {
-        feedback.textContent = `Error: ${err}`;
+        feedback.textContent = `Error: ${err.message || err}`;
       } finally {
         btn.disabled = false;
         btn.textContent = 'Analyze Traffic';

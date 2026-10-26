@@ -160,3 +160,37 @@ def test_server_download_sample_csv(client):
     assert b"total_fwd_packets" in res.data
 
 
+def test_vercel_proxy_headers_routing(client):
+    """Test that VercelPathFixMiddleware correctly restores PATH_INFO from proxy headers."""
+    # 1. Test CSV download when Vercel rewrites to /api/index with HTTP_X_FORWARDED_URI
+    res_csv = client.get(
+        "/api/index",
+        environ_overrides={"HTTP_X_FORWARDED_URI": "/api/download/sample-csv"},
+    )
+    assert res_csv.status_code == 200
+    assert res_csv.mimetype == "text/csv"
+    assert b"flow_duration" in res_csv.data
+
+    # 2. Test root SPA serving when Vercel rewrites to /api/index with HTTP_X_FORWARDED_URI
+    res_root = client.get(
+        "/api/index",
+        environ_overrides={"HTTP_X_FORWARDED_URI": "/"},
+    )
+    assert res_root.status_code == 200
+    assert b"AI-NIDS // CONSOLE" in res_root.data
+
+    # 3. Test API stats retrieval when rewritten to /api/index
+    res_stats = client.get(
+        "/api/index",
+        environ_overrides={"HTTP_X_FORWARDED_URI": "/api/stats"},
+    )
+    assert res_stats.status_code == 200
+    assert "total_alerts" in res_stats.get_json()
+
+    # 4. Test fallback to / when /api/index is accessed directly without proxy headers
+    res_fallback = client.get("/api/index")
+    assert res_fallback.status_code == 200
+    assert b"AI-NIDS // CONSOLE" in res_fallback.data
+
+
+

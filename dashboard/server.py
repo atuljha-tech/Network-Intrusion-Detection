@@ -69,6 +69,46 @@ app = Flask(
     static_url_path="/static",
 )
 
+
+class VercelPathFixMiddleware:
+    """WSGI middleware to correctly set PATH_INFO when running behind Vercel or upstream reverse proxies.
+
+    When Vercel rewrites `/(.*)` to `/api/index`, Vercel invokes the function with PATH_INFO
+    set to `/api/index`. The client's true requested URI is forwarded in HTTP headers such as
+    `HTTP_X_FORWARDED_URI`, `HTTP_X_ORIGINAL_URI`, `HTTP_X_FORWARDED_PATH`, `RAW_URI`, or `REQUEST_URI`.
+    """
+
+    def __init__(self, wsgi_app):
+        self.app = wsgi_app
+
+    def __call__(self, environ, start_response):
+        for header in (
+            "HTTP_X_FORWARDED_URI",
+            "HTTP_X_ORIGINAL_URI",
+            "HTTP_X_FORWARDED_PATH",
+            "RAW_URI",
+            "REQUEST_URI",
+        ):
+            raw_uri = environ.get(header)
+            if raw_uri and raw_uri not in ("/api/index", "/api/index.py"):
+                if "?" in raw_uri:
+                    path_part, query_part = raw_uri.split("?", 1)
+                    environ["PATH_INFO"] = path_part
+                    if not environ.get("QUERY_STRING"):
+                        environ["QUERY_STRING"] = query_part
+                else:
+                    environ["PATH_INFO"] = raw_uri
+                break
+        else:
+            # Fallback: If PATH_INFO is literally '/api/index' or '/api/index.py' on a GET request
+            if environ.get("PATH_INFO") in ("/api/index", "/api/index.py") and environ.get("REQUEST_METHOD", "GET").upper() == "GET":
+                environ["PATH_INFO"] = "/"
+
+        return self.app(environ, start_response)
+
+
+app.wsgi_app = VercelPathFixMiddleware(app.wsgi_app)
+
 # Backend singletons
 alert_mgr = AlertManager(ALERTS_DB_PATH)
 predictor = UnifiedPredictor(auto_load=True)
@@ -114,8 +154,6 @@ def add_cors_headers(response):
 
 @app.route("/", methods=["GET"])
 @app.route("/index.html", methods=["GET"])
-@app.route("/api/index", methods=["GET"])
-@app.route("/api/index.py", methods=["GET"])
 def index():
     """Serve the single-page dashboard HTML application."""
     return send_from_directory(str(STATIC_DIR), "index.html")
@@ -370,8 +408,17 @@ def ingest_csv():
 @app.route("/api/ingest/sample-csv", methods=["POST"])
 def ingest_sample_csv():
     """One-click evaluation of the bundled sample_features.csv."""
-    sample_path = Path("data/sample_features.csv")
-    if not sample_path.exists():
+    sample_path = None
+    for cand in [
+        DATA_DIR / "sample_features.csv",
+        Path("data/sample_features.csv"),
+        DASHBOARD_DIR.parent / "data" / "sample_features.csv",
+    ]:
+        if cand.exists():
+            sample_path = cand
+            break
+
+    if not sample_path or not sample_path.exists():
         return jsonify({"error": "Sample dataset data/sample_features.csv not found."}), 404
 
     model_type = request.form.get("model_type", "multiclass")
@@ -552,15 +599,19 @@ def export_alerts_csv():
 @app.route("/api/download/sample-csv", methods=["GET"])
 def download_sample_csv():
     """Download a verified 66-feature sample CSV datasheet for testing."""
-    sample_path = DATA_DIR / "sample_features.csv"
-    if not sample_path.exists():
-        return jsonify({"error": "Sample datasheet not found."}), 404
-    return send_file(
-        str(sample_path),
-        as_attachment=True,
-        download_name="sample_network_flows.csv",
-        mimetype="text/csv",
-    )
+    for cand in [
+        DATA_DIR / "sample_features.csv",
+        Path("data/sample_features.csv"),
+        DASHBOARD_DIR.parent / "data" / "sample_features.csv",
+    ]:
+        if cand.exists():
+            return send_file(
+                str(cand),
+                as_attachment=True,
+                download_name="sample_network_flows.csv",
+                mimetype="text/csv",
+            )
+    return jsonify({"error": "Sample datasheet not found."}), 404
 
 
 @app.route("/api/alerts/clear", methods=["POST"])
