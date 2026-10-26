@@ -113,6 +113,23 @@ predictor = UnifiedPredictor(auto_load=True)
 
 # ── Feature Schema Validation ────────────────────────────────────────────────
 
+def normalize_df_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Normalize column names to match model feature schema with alias fallback."""
+    cleaned = []
+    for c in df.columns:
+        s = str(c).strip().lower().replace(" ", "_").replace("/", "_").replace("-", "_")
+        # Standard CIC-IDS2017 naming aliases
+        if s in ("total_bwd_packets", "total_backward_packet"):
+            s = "total_backward_packets"
+        elif s in ("total_forward_packets", "total_fwd_packet"):
+            s = "total_fwd_packets"
+        elif s == "fwd_header_length.1":
+            s = "fwd_header_length"
+        cleaned.append(s)
+    df.columns = cleaned
+    return df
+
+
 def validate_csv_columns(df: pd.DataFrame) -> tuple[bool, list[str], list[str]]:
     """Validate that DataFrame contains the required 66 CIC-IDS2017 features.
 
@@ -352,6 +369,7 @@ def ingest_csv():
     except Exception as exc:
         return jsonify({"error": f"Invalid CSV file format: {exc}"}), 400
 
+    df_input = normalize_df_columns(df_input)
     is_valid, missing, stripped = validate_csv_columns(df_input)
     if not is_valid:
         return jsonify({

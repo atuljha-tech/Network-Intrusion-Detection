@@ -1,47 +1,44 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI-NIDS // CONSOLE</title>
   
-  <!-- Unique Google Fonts (Display: Syne, Body: Plus Jakarta Sans, Monospace: JetBrains Mono) -->
+  <!-- JetBrains Mono & Fira Code for Authentic Terminal Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
   
-  <!-- Offline Chart.js -->
+  <!-- Offline Local Chart.js -->
   <script src="/static/chart.umd.min.js"></script>
 
   <style>
     :root {
-      --bg-base: #060911;
-      --bg-card: rgba(13, 20, 36, 0.40);
-      --bg-card-hover: rgba(22, 34, 60, 0.55);
-      --border-subtle: rgba(255, 255, 255, 0.12);
-      --border-focus: rgba(59, 130, 246, 0.5);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
-      --accent-blue: #3b82f6;
-      --accent-emerald: #10b981;
-      --accent-amber: #f59e0b;
-      --accent-crimson: #ef4444;
-      --accent-violet: #8b5cf6;
-      --font-display: 'Syne', sans-serif;
-      --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-    }
-
-    html.light {
-      --bg-base: #cbd5e1;
-      --bg-card: rgba(255, 255, 255, 0.65);
-      --bg-card-hover: rgba(255, 255, 255, 0.85);
-      --border-subtle: rgba(0, 0, 0, 0.14);
-      --border-focus: rgba(37, 99, 235, 0.6);
-      --text-main: #0f172a;
-      --text-muted: #334155;
-      --text-dim: #64748b;
+      --bg-black: #060709;
+      --bg-surface: #0c0e12;
+      --bg-elevated: #12151b;
+      --bg-hover: #181d26;
+      --border-dim: #1f2530;
+      --border-bright: #303949;
+      --border-accent: #00ff66;
+      
+      --text-main: #e6edf3;
+      --text-muted: #8b949e;
+      --text-dim: #484f58;
+      
+      --term-green: #00ff66;
+      --term-green-dim: rgba(0, 255, 102, 0.12);
+      --term-cyan: #00f0ff;
+      --term-cyan-dim: rgba(0, 240, 255, 0.12);
+      --term-amber: #ffb800;
+      --term-amber-dim: rgba(255, 184, 0, 0.12);
+      --term-red: #ff3855;
+      --term-red-dim: rgba(255, 56, 85, 0.14);
+      --term-purple: #c084fc;
+      --term-purple-dim: rgba(192, 132, 252, 0.12);
+      
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
     }
 
     * {
@@ -52,272 +49,298 @@
     }
 
     body {
-      background-color: var(--bg-base);
+      background-color: var(--bg-black);
       background-image: 
-        radial-gradient(ellipse at top, rgba(14, 22, 38, 0.45) 0%, rgba(6, 10, 18, 0.68) 55%, rgba(4, 7, 14, 0.85) 100%),
+        radial-gradient(ellipse at top, rgba(6, 7, 9, 0.75) 0%, rgba(6, 7, 9, 0.95) 70%, #060709 100%),
         url('/static/bg_image.jpg');
       background-size: cover;
       background-position: center top;
       background-attachment: fixed;
-      background-repeat: no-repeat;
       color: var(--text-main);
-      font-family: var(--font-body);
-      font-size: 14px;
+      font-family: var(--font-mono);
+      font-size: 13px;
       line-height: 1.5;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
-    /* ── Typography & Tags ──────────────────────────────────────────────── */
-    h1, h2, h3, h4 {
-      font-family: var(--font-display);
-      letter-spacing: -0.02em;
-      font-weight: 700;
+    /* Subtle CRT terminal scanline overlay */
+    body::before {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      z-index: 999;
+      pointer-events: none;
+      opacity: 0.35;
     }
 
-    .font-mono {
-      font-family: var(--font-mono);
+    /* Monospace links and selection */
+    ::selection {
+      background: var(--term-green);
+      color: #000000;
     }
 
-    /* ── Top Navigation ─────────────────────────────────────────────────── */
-    .nav-bar {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(8, 12, 20, 0.45);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border-subtle);
-      padding: 14px 28px;
+    a {
+      color: var(--term-cyan);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── Top Status Line (tmux/vim style) ────────────────────────────────── */
+    .term-topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-dim);
+      padding: 8px 16px;
+      font-size: 11px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .nav-brand {
+    .term-topbar-left {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
-    .brand-title {
-      font-family: var(--font-display);
-      font-size: 19px;
-      font-weight: 800;
-      color: #ffffff;
-      letter-spacing: -0.03em;
+    .prompt-tag {
+      background: var(--term-green);
+      color: #000000;
+      font-weight: 700;
+      padding: 2px 6px;
+      letter-spacing: 0.04em;
     }
 
-    .system-status {
+    .prompt-path {
+      color: var(--term-cyan);
+    }
+
+    .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-family: var(--font-mono);
-      font-size: 11px;
+      padding: 2px 8px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-dim);
       color: var(--text-muted);
-      padding: 4px 10px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-subtle);
     }
 
-    .dot-indicator {
+    .blink-dot {
       width: 6px;
       height: 6px;
-      border-radius: 50%;
-      background: var(--accent-emerald);
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+      background: var(--term-green);
+      box-shadow: 0 0 6px var(--term-green);
       display: inline-block;
+      animation: blinker 1.8s infinite ease-in-out;
     }
 
-    .nav-actions {
+    @keyframes blinker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    .term-topbar-right {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    .btn-outline {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-subtle);
+    /* ── Terminal Action Buttons ────────────────────────────────────────── */
+    .term-btn {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-dim);
       color: var(--text-muted);
+      padding: 5px 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 0;
+      transition: all 0.12s ease;
+    }
+
+    .term-btn:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-bright);
+      color: var(--text-main);
+    }
+
+    .term-btn-primary {
+      background: var(--term-green);
+      color: #000000;
+      border: 1px solid var(--term-green);
+      font-weight: 700;
+    }
+
+    .term-btn-primary:hover {
+      background: #00e05a;
+      box-shadow: 0 0 12px rgba(0, 255, 102, 0.4);
+      color: #000000;
+    }
+
+    .term-btn-primary:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .term-btn-danger {
+      border-color: var(--term-red);
+      color: var(--term-red);
+    }
+
+    .term-btn-danger:hover {
+      background: var(--term-red-dim);
+      color: #ff6b7d;
+    }
+
+    /* ── Main Layout Container ─────────────────────────────────────────── */
+    .main-wrap {
+      max-width: 1500px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 18px 20px 48px 20px;
+      flex: 1;
+    }
+
+    /* ── Header Terminal Banner ────────────────────────────────────────── */
+    .term-banner {
+      border: 1px solid var(--border-dim);
+      background: var(--bg-surface);
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .banner-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--term-green);
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cursor-block {
+      display: inline-block;
+      width: 8px;
+      height: 14px;
+      background: var(--term-green);
+      vertical-align: middle;
+      animation: blinker 1s infinite;
+    }
+
+    .banner-sub {
+      color: var(--text-dim);
+      font-size: 12px;
+    }
+
+    .banner-meta {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    /* ── Terminal Section Box ──────────────────────────────────────────── */
+    .term-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-dim);
+      margin-bottom: 20px;
+    }
+
+    .term-box-header {
+      padding: 10px 14px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-dim);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .term-box-header-title {
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .term-box-body {
+      padding: 16px;
+    }
+
+    /* Mode Navigation Tabs */
+    .term-tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border-dim);
+      margin-bottom: 16px;
+    }
+
+    .term-tab {
+      background: transparent;
+      border: 1px solid transparent;
+      border-bottom: none;
       padding: 6px 14px;
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 600;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .btn-outline:hover {
-      color: var(--text-main);
-      border-color: rgba(255, 255, 255, 0.3);
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    /* ── Hero Banner ────────────────────────────────────────────────────── */
-    .hero-banner {
-      position: relative;
-      background: transparent;
-      padding: 44px 28px 24px 28px;
-    }
-
-    .hero-content {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .hero-heading {
-      font-size: 34px;
-      line-height: 1.15;
-      color: #ffffff;
-      font-weight: 800;
-      margin-bottom: 8px;
-      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
-    }
-
-    .hero-subtext {
       color: var(--text-muted);
-      font-size: 14px;
-      max-width: 760px;
-      line-height: 1.6;
+      cursor: pointer;
     }
 
-    /* ── Main Container ────────────────────────────────────────────────── */
-    .main-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 16px 28px 48px 28px;
-      width: 100%;
-      flex: 1;
-    }
-
-    /* ── Transparent Glass Panels & Cards ──────────────────────────────── */
-    .panel-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      margin-bottom: 24px;
-      overflow: hidden;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
-    }
-
-    .panel-header {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(13, 20, 36, 0.35);
-      backdrop-filter: blur(8px);
-    }
-
-    .panel-title {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
+    .term-tab:hover {
       color: var(--text-main);
     }
 
-    .panel-body {
-      padding: 22px;
+    .term-tab.active {
+      color: var(--term-green);
+      background: var(--bg-elevated);
+      border-color: var(--border-dim);
+      border-bottom: 1px solid var(--bg-elevated);
+      margin-bottom: -1px;
     }
 
-    /* Empty State Waiting Card */
-    .empty-state-box {
+    /* Drag & Drop Terminal Zone */
+    .term-dropzone {
+      border: 1px dashed var(--border-bright);
+      background: var(--bg-black);
+      padding: 24px 16px;
       text-align: center;
-      padding: 48px 24px;
-      background: rgba(13, 20, 36, 0.35);
-    }
-
-    .empty-state-badge {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--accent-blue);
-      background: rgba(59, 130, 246, 0.12);
-      border: 1px solid rgba(59, 130, 246, 0.25);
-      border-radius: 4px;
-      padding: 4px 12px;
-      margin-bottom: 12px;
-    }
-
-    .empty-state-title {
-      font-size: 22px;
-      color: #ffffff;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .empty-state-desc {
-      color: var(--text-muted);
-      font-size: 14px;
-      max-width: 600px;
-      margin: 0 auto 16px auto;
-      line-height: 1.6;
-    }
-
-    .empty-state-hints {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-
-    /* Tab Switcher */
-    .tab-nav {
-      display: flex;
-      gap: 10px;
-      border-bottom: 1px solid var(--border-subtle);
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-    }
-
-    .tab-btn {
-      background: transparent;
-      border: 1px solid transparent;
-      padding: 8px 18px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      color: var(--text-muted);
-      border-radius: 4px;
       cursor: pointer;
       transition: all 0.15s ease;
+      margin-bottom: 14px;
     }
 
-    .tab-btn.active {
-      color: #ffffff;
-      background: rgba(59, 130, 246, 0.18);
-      border-color: rgba(59, 130, 246, 0.45);
-    }
-
-    /* Dropzone */
-    .dropzone {
-      border: 1px dashed rgba(255, 255, 255, 0.22);
-      border-radius: 6px;
-      padding: 34px 20px;
-      text-align: center;
-      background: rgba(10, 16, 30, 0.30);
-      backdrop-filter: blur(8px);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      margin-bottom: 16px;
-    }
-
-    .dropzone:hover, .dropzone.dragover {
-      border-color: var(--accent-blue);
-      background: rgba(59, 130, 246, 0.08);
+    .term-dropzone:hover, .term-dropzone.dragover {
+      border-color: var(--term-green);
+      background: var(--term-green-dim);
     }
 
     .dropzone-label {
-      font-family: var(--font-mono);
       font-size: 12px;
       font-weight: 600;
       color: var(--text-main);
@@ -325,721 +348,699 @@
     }
 
     .dropzone-sub {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-dim);
     }
 
-    /* Controls Bar */
-    .controls-bar {
+    /* Terminal Controls Row */
+    .term-controls {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 12px;
       flex-wrap: wrap;
-      margin-top: 14px;
     }
 
-    .options-group {
+    .term-controls-left {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
-    .select-input {
-      background: rgba(8, 14, 26, 0.65);
-      border: 1px solid var(--border-subtle);
+    .term-select {
+      background: var(--bg-black);
+      border: 1px solid var(--border-bright);
       color: var(--text-main);
-      padding: 8px 14px;
-      border-radius: 4px;
+      padding: 6px 10px;
       font-family: var(--font-mono);
       font-size: 11px;
-      font-weight: 600;
       outline: none;
+      border-radius: 0;
     }
 
-    .select-input:focus {
-      border-color: var(--accent-blue);
+    .term-select:focus {
+      border-color: var(--term-green);
     }
 
-    .checkbox-label {
+    .term-check {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      font-family: var(--font-mono);
+      gap: 6px;
       font-size: 11px;
       color: var(--text-muted);
       cursor: pointer;
+      user-select: none;
     }
 
-    .checkbox-label input {
-      accent-color: var(--accent-blue);
+    .term-check input {
+      accent-color: var(--term-green);
       cursor: pointer;
     }
 
-    .btn-primary {
-      background: var(--accent-blue);
-      color: #ffffff;
-      border: none;
-      padding: 10px 24px;
-      font-family: var(--font-mono);
-      font-size: 12px;
+    /* Ingestion Feedback Log Box */
+    .term-log-output {
+      margin-top: 14px;
+      padding: 10px 14px;
+      background: var(--bg-black);
+      border: 1px solid var(--border-dim);
+      font-size: 11px;
+      color: var(--term-green);
+      line-height: 1.6;
+      border-left: 3px solid var(--term-green);
+    }
+
+    /* ── Empty State Waiting Box ───────────────────────────────────────── */
+    .empty-term-box {
+      text-align: center;
+      padding: 40px 20px;
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-dim);
+      margin-bottom: 20px;
+    }
+
+    .empty-term-title {
+      font-size: 15px;
       font-weight: 700;
-      letter-spacing: 0.04em;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .btn-primary:hover {
-      background: #2563eb;
-      box-shadow: 0 0 16px rgba(59, 130, 246, 0.45);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-main);
-      padding: 8px 16px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 600;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.25);
-    }
-
-    /* ── KPI Grid ──────────────────────────────────────────────────────── */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .kpi-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 18px 20px;
-      position: relative;
-      overflow: hidden;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    }
-
-    .kpi-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: var(--border-subtle);
-    }
-
-    .kpi-card.amber::before { background: var(--accent-amber); }
-    .kpi-card.crimson::before { background: var(--accent-crimson); }
-    .kpi-card.violet::before { background: var(--accent-violet); }
-    .kpi-card.blue::before { background: var(--accent-blue); }
-
-    .kpi-label {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      color: var(--text-muted);
+      color: var(--term-amber);
       margin-bottom: 8px;
     }
 
-    .kpi-value {
-      font-family: var(--font-mono);
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--text-main);
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-
-    .kpi-card.amber .kpi-value { color: var(--accent-amber); }
-    .kpi-card.crimson .kpi-value { color: var(--accent-crimson); }
-    .kpi-card.violet .kpi-value { color: var(--accent-violet); }
-    .kpi-card.blue .kpi-value { color: var(--accent-blue); }
-
-    .kpi-desc {
+    .empty-term-text {
       font-size: 12px;
-      color: var(--text-dim);
+      color: var(--text-muted);
+      max-width: 620px;
+      margin: 0 auto 14px auto;
+      line-height: 1.6;
     }
 
-    /* ── Forensic Charts Grid ──────────────────────────────────────────── */
-    .charts-grid {
+    /* ── KPI Telemetry Grid ────────────────────────────────────────────── */
+    .term-kpi-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
     }
 
-    @media (max-width: 1024px) {
-      .charts-grid {
-        grid-template-columns: 1fr;
-      }
+    .term-kpi-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-dim);
+      padding: 12px 14px;
+      position: relative;
     }
 
-    .chart-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      padding: 18px 20px;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    .term-kpi-item::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 3px; bottom: 0;
+      background: var(--border-bright);
+    }
+    .term-kpi-item.cyan::before { background: var(--term-cyan); }
+    .term-kpi-item.amber::before { background: var(--term-amber); }
+    .term-kpi-item.red::before { background: var(--term-red); }
+    .term-kpi-item.purple::before { background: var(--term-purple); }
+    .term-kpi-item.green::before { background: var(--term-green); }
+
+    .term-kpi-label {
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
     }
 
-    .chart-title {
+    .term-kpi-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-main);
       font-family: var(--font-mono);
+      letter-spacing: -0.02em;
+    }
+
+    .term-kpi-desc {
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    /* ── Terminal Charts Grid ──────────────────────────────────────────── */
+    .term-charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .term-chart-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-dim);
+      padding: 14px;
+    }
+
+    .term-chart-header {
       font-size: 11px;
       font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 14px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-dim);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
-    .chart-container {
+    .chart-box {
       position: relative;
       height: 220px;
       width: 100%;
     }
 
-    /* ── Table Styling ─────────────────────────────────────────────────── */
-    .table-container {
-      width: 100%;
-      overflow-x: auto;
+    /* ── Terminal Alert Filter & Data Grid ─────────────────────────────── */
+    .term-filter-bar {
+      padding: 10px 14px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-dim);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
-    .triage-table {
+    .term-search-input {
+      flex: 1;
+      min-width: 220px;
+      background: var(--bg-black);
+      border: 1px solid var(--border-bright);
+      color: var(--text-main);
+      padding: 6px 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      outline: none;
+    }
+
+    .term-search-input:focus {
+      border-color: var(--term-green);
+    }
+
+    .term-table-wrap {
+      overflow-x: auto;
+      background: var(--bg-black);
+    }
+
+    .term-table {
       width: 100%;
       border-collapse: collapse;
-      font-family: var(--font-mono);
       font-size: 12px;
       text-align: left;
     }
 
-    .triage-table th {
-      padding: 12px 16px;
-      background: rgba(10, 16, 30, 0.40);
-      color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 600;
-      border-bottom: 1px solid var(--border-subtle);
+    .term-table th {
+      background: var(--bg-surface);
+      color: var(--text-dim);
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-dim);
       white-space: nowrap;
     }
 
-    .triage-table td {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border-subtle);
-      color: var(--text-main);
+    .term-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-dim);
       white-space: nowrap;
+      vertical-align: middle;
     }
 
-    .triage-table tr:hover td {
-      background: rgba(59, 130, 246, 0.08);
+    .term-table tbody tr {
       cursor: pointer;
+      transition: background 0.1s ease;
     }
 
-    .tag-badge {
+    .term-table tbody tr:hover {
+      background: var(--bg-hover);
+    }
+
+    /* Terminal Badges */
+    .term-tag {
       display: inline-block;
-      padding: 3px 8px;
-      border-radius: 3px;
+      padding: 2px 6px;
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
     }
 
     .tag-benign {
-      background: rgba(16, 185, 129, 0.15);
-      color: var(--accent-emerald);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: var(--term-green-dim);
+      color: var(--term-green);
+      border: 1px solid rgba(0, 255, 102, 0.3);
     }
 
     .tag-threat {
-      background: rgba(239, 68, 68, 0.15);
-      color: var(--accent-crimson);
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      background: var(--term-red-dim);
+      color: var(--term-red);
+      border: 1px solid rgba(255, 56, 85, 0.35);
     }
 
     .tag-anomaly {
-      background: rgba(139, 92, 246, 0.15);
-      color: var(--accent-violet);
-      border: 1px solid rgba(139, 92, 246, 0.3);
+      background: var(--term-purple-dim);
+      color: var(--term-purple);
+      border: 1px solid rgba(192, 132, 252, 0.35);
     }
 
     .tag-new {
-      background: rgba(245, 158, 11, 0.15);
-      color: var(--accent-amber);
-      border: 1px solid rgba(245, 158, 11, 0.3);
+      background: var(--term-amber-dim);
+      color: var(--term-amber);
+      border: 1px solid rgba(255, 184, 0, 0.3);
     }
-
     .tag-investigating {
-      background: rgba(59, 130, 246, 0.15);
-      color: var(--accent-blue);
-      border: 1px solid rgba(59, 130, 246, 0.3);
+      background: var(--term-cyan-dim);
+      color: var(--term-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.3);
     }
-
     .tag-confirmed {
-      background: rgba(239, 68, 68, 0.2);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.4);
+      background: var(--term-red-dim);
+      color: var(--term-red);
+      border: 1px solid rgba(255, 56, 85, 0.3);
     }
-
     .tag-false-positive {
-      background: rgba(148, 163, 184, 0.15);
-      color: #cbd5e1;
-      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(139, 148, 158, 0.15);
+      color: var(--text-muted);
+      border: 1px solid var(--border-bright);
     }
-
     .tag-resolved {
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: var(--term-green-dim);
+      color: var(--term-green);
+      border: 1px solid rgba(0, 255, 102, 0.3);
     }
 
-    .conf-bar-wrapper {
-      display: flex;
+    /* Micro confidence bar */
+    .term-conf-bar {
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
-
-    .conf-bar {
+    .term-conf-track {
       width: 50px;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 3px;
-      overflow: hidden;
+      height: 4px;
+      background: var(--border-dim);
+      position: relative;
     }
-
-    .conf-bar-fill {
+    .term-conf-fill {
       height: 100%;
-      background: var(--accent-blue);
-      border-radius: 3px;
+      background: var(--term-green);
     }
 
-    /* ── Modal ─────────────────────────────────────────────────────────── */
-    .modal-overlay {
+    /* ── Terminal Modal Overlay ────────────────────────────────────────── */
+    .term-modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(8px);
-      z-index: 100;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
       display: none;
       align-items: center;
       justify-content: center;
       padding: 20px;
     }
 
-    .modal-overlay.active {
+    .term-modal-overlay.active {
       display: flex;
     }
 
-    .modal-box {
-      background: rgba(13, 20, 36, 0.92);
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      max-width: 680px;
+    .term-modal {
+      background: var(--bg-surface);
+      border: 1px solid var(--term-cyan);
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+      max-width: 720px;
       width: 100%;
       max-height: 90vh;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(20px);
     }
 
-    .modal-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border-subtle);
+    .term-modal-header {
+      padding: 10px 14px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-dim);
       display: flex;
       align-items: center;
       justify-content: space-between;
-    }
-
-    .modal-title {
-      font-family: var(--font-mono);
-      font-size: 13px;
+      color: var(--term-cyan);
       font-weight: 700;
-      color: #ffffff;
+      font-size: 12px;
     }
 
-    .modal-body {
-      padding: 20px;
+    .term-modal-body {
+      padding: 16px;
       overflow-y: auto;
+      font-size: 12px;
       flex: 1;
     }
 
-    .dossier-grid {
+    .term-dossier-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 18px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+      background: var(--bg-black);
+      padding: 12px;
+      border: 1px solid var(--border-dim);
     }
 
-    .dossier-item-label {
-      font-family: var(--font-mono);
-      font-size: 11px;
+    .dossier-label {
+      font-size: 10px;
       color: var(--text-dim);
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
-
-    .dossier-item-val {
-      font-family: var(--font-mono);
-      font-size: 12px;
+    .dossier-val {
       font-weight: 600;
       color: var(--text-main);
     }
 
-    .xai-box {
-      background: rgba(8, 14, 26, 0.5);
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 14px;
-      margin-bottom: 18px;
-    }
-
-    .xai-title {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--accent-violet);
-      margin-bottom: 8px;
-    }
-
-    .xai-list {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-muted);
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .textarea-notes {
-      width: 100%;
-      height: 90px;
-      background: rgba(8, 14, 26, 0.7);
-      border: 1px solid var(--border-subtle);
-      border-radius: 4px;
-      color: var(--text-main);
-      padding: 10px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      outline: none;
-      resize: vertical;
-      margin-top: 6px;
+    .term-xai-box {
+      background: var(--bg-black);
+      border: 1px solid var(--border-dim);
+      padding: 12px;
       margin-bottom: 16px;
     }
 
-    .textarea-notes:focus {
-      border-color: var(--accent-blue);
-    }
-
-    .modal-footer {
-      padding: 14px 20px;
-      border-top: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 10px;
-      background: rgba(10, 16, 30, 0.4);
-    }
-
-    /* ── Footer ────────────────────────────────────────────────────────── */
-    .site-footer {
-      background: rgba(8, 12, 20, 0.75);
-      border-top: 1px solid var(--border-subtle);
-      padding: 24px;
-      margin-top: auto;
-      backdrop-filter: blur(12px);
-    }
-
-    .footer-grid {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-    }
-
-    @media (max-width: 768px) {
-      .footer-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .footer-col-title {
-      font-family: var(--font-mono);
+    .term-xai-title {
       font-size: 11px;
       font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 6px;
+      color: var(--term-purple);
+      margin-bottom: 8px;
     }
 
-    .footer-col-text {
-      font-size: 12px;
-      color: var(--text-dim);
-      line-height: 1.6;
-    }
-
-    /* Toast Notification */
-    .toast-box {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 120;
-      background: #0f172a;
-      border: 1px solid var(--accent-blue);
-      color: #ffffff;
-      padding: 12px 18px;
-      border-radius: 6px;
+    .term-textarea {
+      width: 100%;
+      height: 70px;
+      background: var(--bg-black);
+      border: 1px solid var(--border-bright);
+      color: var(--text-main);
+      padding: 8px;
       font-family: var(--font-mono);
-      font-size: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+      font-size: 11px;
+      outline: none;
+      resize: vertical;
+      margin-top: 4px;
+      margin-bottom: 12px;
+    }
+
+    .term-textarea:focus {
+      border-color: var(--term-green);
+    }
+
+    .term-modal-footer {
+      padding: 10px 14px;
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border-dim);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* ── Terminal Footer ───────────────────────────────────────────────── */
+    .term-footer {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-dim);
+      padding: 14px 20px;
+      font-size: 11px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    /* Toast */
+    .term-toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--term-green);
+      color: var(--term-green);
+      padding: 10px 16px;
+      font-size: 11px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
+      z-index: 1200;
       display: none;
     }
-
-    .toast-box.show {
+    .term-toast.show {
       display: block;
-      animation: fadeIn 0.2s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
 
-  <!-- ── 1. Top Navigation Bar ────────────────────────────────────────────── -->
-  <header class="nav-bar">
-    <div class="nav-brand">
-      <span class="brand-title">AI-NIDS // CONSOLE</span>
+  <!-- ── 1. Top Terminal Statusline ──────────────────────────────────────── -->
+  <header class="term-topbar">
+    <div class="term-topbar-left">
+      <span class="prompt-tag">AI-NIDS</span>
+      <span class="prompt-path">root@soc-terminal:~#</span>
+      <span class="status-badge">
+        <span class="blink-dot"></span>
+        <span id="conn-indicator">ENGINE ONLINE</span>
+      </span>
+      <span style="color: var(--text-dim);">//</span>
+      <span style="color: var(--text-dim);">PASSIVE_SNIFFER</span>
+      <span style="color: var(--text-dim);">//</span>
+      <span style="color: var(--text-dim);">METADATA_ONLY</span>
+    </div>
+
+    <div class="term-topbar-right">
+      <span id="term-clock" style="color: var(--text-muted); font-size: 11px;">UTC --:--:--</span>
+      <button class="term-btn" onclick="loadStats()">[ REFRESH ]</button>
     </div>
   </header>
 
-  <!-- ── Hero Banner ────────────────────────────────────────────────────── -->
-  <section class="hero-banner">
-    <div class="hero-content">
-      <h1 class="hero-heading">Network Intrusion Detection Console</h1>
-      <p class="hero-subtext">
-        Passive traffic flow inspection, unsupervised anomaly scoring, and machine learning threat attribution.
-      </p>
-    </div>
-  </section>
+  <!-- ── Main Workspace ────────────────────────────────────────────────── -->
+  <main class="main-wrap">
 
-  <main class="main-container">
-
-    <!-- ── 2. Data Ingestion & Analysis Panel (Always available at top) ──── -->
-    <section class="panel-box" id="ingestion-section">
-      <div class="panel-header">
-        <span class="panel-title">Network Ingestion & Threat Analysis</span>
-        <span class="font-mono" style="font-size: 11px; color: var(--text-dim);" id="ingest-status">Ready</span>
+    <!-- Terminal Header Banner -->
+    <div class="term-banner">
+      <div>
+        <div class="banner-title">
+          <span>AI-POWERED NETWORK INTRUSION DETECTION SYSTEM</span>
+          <span class="cursor-block"></span>
+        </div>
+        <div class="banner-sub">
+          Automated 5-tuple flow reconstruction &bull; Multiclass threat categorization &bull; Unsupervised Isolation Forest outliers
+        </div>
       </div>
-      <div class="panel-body">
-        
-        <!-- Mode Tabs -->
-        <div class="tab-nav">
-          <button class="tab-btn active" id="tab-csv-btn" onclick="switchTab('csv')">Flow Feature CSV</button>
-          <button class="tab-btn" id="tab-pcap-btn" onclick="switchTab('pcap')">Network Packet PCAP</button>
+      <div class="banner-meta">
+        <div>EXEC_ENV: LOCALHOST_OFFLINE</div>
+        <div>FEATURE_SCHEMA: CIC-IDS2017 (66F)</div>
+        <div>OP_BUDGET: &#8377;0 (NO_CLOUD_APIS)</div>
+      </div>
+    </div>
+
+    <!-- ── 2. Ingestion & Analysis Section ──────────────────────────────── -->
+    <section class="term-box" id="ingestion-section">
+      <div class="term-box-header">
+        <div class="term-box-header-title">
+          <span style="color: var(--term-green);">[+]</span>
+          <span>01_INGESTION_ENGINE</span>
+        </div>
+        <span id="ingest-status" style="font-size: 11px; color: var(--term-cyan);">READY</span>
+      </div>
+
+      <div class="term-box-body">
+        <!-- Ingestion Tabs -->
+        <div class="term-tabs">
+          <button class="term-tab active" id="tab-csv-btn" onclick="switchTab('csv')">[ 66-FEATURE FLOW CSV ]</button>
+          <button class="term-tab" id="tab-pcap-btn" onclick="switchTab('pcap')">[ RAW PCAP / PCAPNG TRACE ]</button>
         </div>
 
         <!-- CSV Dropzone -->
-        <div id="dropzone-csv" class="dropzone" onclick="document.getElementById('csv-file-input').click()">
-          <input type="file" id="csv-file-input" accept=".csv" style="display: none;" onchange="handleFileSelect(event, 'csv')">
-          <div class="dropzone-label">Drop 66-Feature CSV Here or Click to Browse</div>
-          <div class="dropzone-sub">Requires numeric flow features matching CIC-IDS2017 schema. <a href="/api/download/sample-csv" download="sample_network_flows.csv" style="color: var(--accent-blue); text-decoration: underline;" onclick="event.stopPropagation();">Download sample datasheet (.csv)</a> to test upload.</div>
-          <div id="csv-file-name" class="font-mono" style="color: var(--accent-blue); font-size: 12px; margin-top: 6px;"></div>
+        <input type="file" id="csv-file-input" accept=".csv" style="display: none;" onchange="handleFileSelect(event, 'csv')">
+        <div id="dropzone-csv" class="term-dropzone" onclick="triggerFileInput('csv')">
+          <div id="csv-prompt-box">
+            <div class="dropzone-label">&gt;&gt; CLICK TO BROWSE OR DRAG &amp; DROP 66-FEATURE FLOW CSV HERE &lt;&lt;</div>
+            <div class="dropzone-sub">Accepts 66 numerical flow metrics. Target labels are stripped automatically to prevent leakage.</div>
+          </div>
+          <div id="csv-staged-box" style="display: none; padding: 6px; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <span style="color: var(--term-green); font-weight: 700;">[ STAGED DATASET ]</span>
+            <span id="csv-file-name" style="color: var(--text-main); font-weight: 600;"></span>
+            <button class="term-btn term-btn-danger" style="padding: 2px 8px; font-size: 10px;" onclick="unstageFile(event, 'csv')">[ X UNSTAGE ]</button>
+          </div>
         </div>
 
         <!-- PCAP Dropzone -->
-        <div id="dropzone-pcap" class="dropzone" style="display: none;" onclick="document.getElementById('pcap-file-input').click()">
-          <input type="file" id="pcap-file-input" accept=".pcap,.pcapng,.cap" style="display: none;" onchange="handleFileSelect(event, 'pcap')">
-          <div class="dropzone-label">Drop PCAP / PCAPNG Trace Here or Click to Browse</div>
-          <div class="dropzone-sub">Ingests packet streams, reconstructs bi-directional 5-tuple conversations, and computes statistical features.</div>
-          <div id="pcap-file-name" class="font-mono" style="color: var(--accent-blue); font-size: 12px; margin-top: 6px;"></div>
+        <input type="file" id="pcap-file-input" accept=".pcap,.pcapng,.cap" style="display: none;" onchange="handleFileSelect(event, 'pcap')">
+        <div id="dropzone-pcap" class="term-dropzone" style="display: none;" onclick="triggerFileInput('pcap')">
+          <div id="pcap-prompt-box">
+            <div class="dropzone-label">&gt;&gt; CLICK TO BROWSE OR DRAG &amp; DROP PACKET CAPTURE (.PCAP / .PCAPNG) HERE &lt;&lt;</div>
+            <div class="dropzone-sub">Real-time Scapy dissection into bi-directional 5-tuple conversations with zero payload logging.</div>
+          </div>
+          <div id="pcap-staged-box" style="display: none; padding: 6px; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <span style="color: var(--term-cyan); font-weight: 700;">[ STAGED PCAP ]</span>
+            <span id="pcap-file-name" style="color: var(--text-main); font-weight: 600;"></span>
+            <button class="term-btn term-btn-danger" style="padding: 2px 8px; font-size: 10px;" onclick="unstageFile(event, 'pcap')">[ X UNSTAGE ]</button>
+          </div>
         </div>
 
-        <!-- Controls & Sample Loaders -->
-        <div class="controls-bar">
-          <div class="options-group">
-            <a href="/api/download/sample-csv" download="sample_network_flows.csv" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center;">Download Sample Datasheet</a>
-            <button class="btn-secondary" onclick="loadSampleCSV()">Load Sample CSV</button>
-            <button class="btn-secondary" onclick="loadSamplePCAP()">Load Sample PCAP</button>
+        <!-- Controls Bar -->
+        <div class="term-controls">
+          <div class="term-controls-left">
+            <a href="/api/download/sample-csv" download="sample_network_flows.csv" class="term-btn" title="Download the 250-row 66-feature sample dataset">[ DOWNLOAD SAMPLE CSV ]</a>
+            <button class="term-btn" id="btn-load-sample-csv" onclick="loadSampleCSV()">[ LOAD SAMPLE CSV (250 ROWS) ]</button>
+            <button class="term-btn" id="btn-load-sample-pcap" onclick="loadSamplePCAP()">[ LOAD SAMPLE PCAP ]</button>
             
-            <select class="select-input" id="model-select">
-              <option value="multiclass">Model: Multiclass (13 Attack Classes)</option>
-              <option value="binary">Model: Binary (Benign vs Malicious)</option>
+            <select class="term-select" id="model-select">
+              <option value="multiclass">PARADIGM: MULTICLASS (13 ATTACKS)</option>
+              <option value="binary">PARADIGM: BINARY (BENIGN VS MALICIOUS)</option>
             </select>
 
-            <label class="checkbox-label">
+            <label class="term-check">
               <input type="checkbox" id="chk-anomaly" checked>
-              <span>Anomaly Scoring</span>
+              <span>ANOMALY_SCORING</span>
             </label>
 
-            <label class="checkbox-label">
+            <label class="term-check">
               <input type="checkbox" id="chk-xai" checked>
-              <span>Feature Attribution</span>
+              <span>XAI_ATTRIBUTION</span>
             </label>
           </div>
 
-          <button class="btn-primary" id="btn-execute" onclick="executeInference()">Analyze Traffic</button>
+          <button class="term-btn term-btn-primary" id="btn-execute" onclick="executeInference()">[ RUN INFERENCE ]</button>
         </div>
 
-        <!-- Ingestion Feedback Banner -->
-        <div id="ingest-feedback" style="display: none; margin-top: 16px; padding: 12px 16px; background: rgba(8, 14, 26, 0.6); border: 1px solid var(--border-subtle); border-radius: 4px; font-family: var(--font-mono); font-size: 12px;"></div>
-
+        <!-- Ingestion Status Output -->
+        <div id="ingest-feedback" class="term-log-output" style="display: none;"></div>
       </div>
     </section>
 
-    <!-- ── 3. Empty State Card (Visible when no data is loaded) ──────────── -->
-    <section class="panel-box empty-state-box" id="empty-state-section">
-      <div class="empty-state-badge">Awaiting Data Ingestion</div>
-      <h2 class="empty-state-title">No Traffic Data Loaded Yet</h2>
-      <p class="empty-state-desc">
-        Upload a 66-feature flow CSV dataset or PCAP network capture above to initiate threat classification, compute anomaly scores, and populate live telemetry charts and alert records.
+    <!-- ── 3. Empty State Card ─────────────────────────────────────────── -->
+    <section class="empty-term-box" id="empty-state-section">
+      <div class="empty-term-title">&gt;&gt; AWAITING INGESTION STREAM &lt;&lt;</div>
+      <p class="empty-term-text">
+        No active telemetry records. Drop a network flow CSV or PCAP capture above, or click 
+        <strong style="color: var(--text-main);">[ LOAD SAMPLE CSV ]</strong> / <strong style="color: var(--text-main);">[ LOAD SAMPLE PCAP ]</strong> 
+        to test the machine learning pipelines.
       </p>
-      <div class="empty-state-hints">
-        Tip: You can click "Load Sample CSV" or "Load Sample PCAP" above to test the system with preloaded data.
+      <div style="font-size: 11px; color: var(--text-dim);">
+        [ TIP: Ingestion performs schema validation, feature scaling, and Isolation Forest scoring in &lt;15ms ]
       </div>
     </section>
 
-    <!-- ── 4. Executive KPI Metrics Cards (Visible once data is ingested) ── -->
-    <section class="kpi-grid" id="kpi-section" style="display: none;">
-      <div class="kpi-card blue">
-        <div class="kpi-label">TOTAL INGESTED FLOWS / ALERTS</div>
-        <div class="kpi-value" id="kpi-total">0</div>
-        <div class="kpi-desc">Registered in database</div>
+    <!-- ── 4. Telemetry KPI Grid ───────────────────────────────────────── -->
+    <section class="term-kpi-grid" id="kpi-section" style="display: none;">
+      <div class="term-kpi-item cyan">
+        <div class="term-kpi-label">TOTAL_FLOWS_LOGGED</div>
+        <div class="term-kpi-val" id="kpi-total">0</div>
+        <div class="term-kpi-desc">Indexed in SQLite alerts.db</div>
       </div>
-      <div class="kpi-card amber">
-        <div class="kpi-label">UNRESOLVED BACKLOG</div>
-        <div class="kpi-value" id="kpi-backlog">0</div>
-        <div class="kpi-desc">Status: New / Investigating</div>
+      <div class="term-kpi-item amber">
+        <div class="term-kpi-label">UNRESOLVED_BACKLOG</div>
+        <div class="term-kpi-val" id="kpi-backlog">0</div>
+        <div class="term-kpi-desc">State: New / Investigating</div>
       </div>
-      <div class="kpi-card crimson">
-        <div class="kpi-label">CONFIRMED INCIDENTS</div>
-        <div class="kpi-value" id="kpi-confirmed">0</div>
-        <div class="kpi-desc">Analyst-verified threats</div>
+      <div class="term-kpi-item red">
+        <div class="term-kpi-label">CONFIRMED_INCIDENTS</div>
+        <div class="term-kpi-val" id="kpi-confirmed">0</div>
+        <div class="term-kpi-desc">Escalated threat vectors</div>
       </div>
-      <div class="kpi-card violet">
-        <div class="kpi-label">STATISTICAL ANOMALIES</div>
-        <div class="kpi-value" id="kpi-anomalies">0</div>
-        <div class="kpi-desc">Isolation Forest outliers</div>
+      <div class="term-kpi-item purple">
+        <div class="term-kpi-label">STATISTICAL_OUTLIERS</div>
+        <div class="term-kpi-val" id="kpi-anomalies">0</div>
+        <div class="term-kpi-desc">Isolation Forest anomalies</div>
       </div>
-      <div class="kpi-card blue">
-        <div class="kpi-label">INFERENCE LATENCY</div>
-        <div class="kpi-value" id="kpi-latency">10.9 ms</div>
-        <div class="kpi-desc">Empirical per-flow processing</div>
+      <div class="term-kpi-item green">
+        <div class="term-kpi-label">EMPIRICAL_LATENCY</div>
+        <div class="term-kpi-val" id="kpi-latency">10.9 ms</div>
+        <div class="term-kpi-desc">Median per-flow inference</div>
       </div>
     </section>
 
-    <!-- ── 5. Forensic Telemetry & Distribution Charts (Visible once data is ingested) -->
-    <section class="charts-grid" id="charts-section" style="display: none;">
-      <div class="chart-card">
-        <div class="chart-title">
-          <span>Attack Category Breakdown</span>
-          <span style="color: var(--accent-blue);">Distribution</span>
+    <!-- ── 5. Forensic Telemetry Charts ────────────────────────────────── -->
+    <section class="term-charts-grid" id="charts-section" style="display: none;">
+      <div class="term-chart-card">
+        <div class="term-chart-header">
+          <span>// 01_ATTACK_DISTRIBUTION</span>
+          <span style="color: var(--term-cyan);">CATEGORIES</span>
         </div>
-        <div class="chart-container">
+        <div class="chart-box">
           <canvas id="chart-attacks"></canvas>
         </div>
       </div>
 
-      <div class="chart-card">
-        <div class="chart-title">
-          <span>Triage Lifecycle Distribution</span>
-          <span style="color: var(--accent-amber);">Status</span>
+      <div class="term-chart-card">
+        <div class="term-chart-header">
+          <span>// 02_TRIAGE_LIFECYCLE</span>
+          <span style="color: var(--term-amber);">STATUS</span>
         </div>
-        <div class="chart-container">
+        <div class="chart-box">
           <canvas id="chart-lifecycle"></canvas>
         </div>
       </div>
 
-      <div class="chart-card">
-        <div class="chart-title">
-          <span>Benchmark Latency & Flow Rates</span>
-          <span style="color: var(--accent-emerald);">P95</span>
+      <div class="term-chart-card">
+        <div class="term-chart-header">
+          <span>// 03_BENCHMARK_TELEMETRY</span>
+          <span style="color: var(--term-green);">LATENCY_P95</span>
         </div>
-        <div class="chart-container">
+        <div class="chart-box">
           <canvas id="chart-latency"></canvas>
         </div>
       </div>
     </section>
 
-    <!-- ── 6. Security Alerts & Triage Feed (Visible once data is ingested) ── -->
-    <section class="panel-box" id="alerts-section" style="display: none;">
-      <div class="panel-header">
-        <span class="panel-title">Security Alert Triage Feed</span>
+    <!-- ── 6. Alert Triage Feed ────────────────────────────────────────── -->
+    <section class="term-box" id="alerts-section" style="display: none;">
+      <div class="term-box-header">
+        <div class="term-box-header-title">
+          <span style="color: var(--term-green);">[+]</span>
+          <span>02_ALERT_TRIAGE_DATA_GRID</span>
+        </div>
         <div style="display: flex; gap: 8px;">
-          <button class="btn-outline" onclick="exportSanitizedCSV()">Export Report (CSV)</button>
-          <button class="btn-outline" onclick="loadAlerts()">Refresh Feed</button>
-          <button class="btn-outline" onclick="clearData()" style="color: var(--accent-crimson);">Clear Data</button>
+          <button class="term-btn" onclick="exportSanitizedCSV()">[ EXPORT CSV ]</button>
+          <button class="term-btn" onclick="loadAlerts()">[ REFRESH ]</button>
+          <button class="term-btn term-btn-danger" onclick="clearData()">[ PURGE ALERTS ]</button>
         </div>
       </div>
-      
-      <!-- Filter Bar -->
-      <div style="padding: 14px 20px; border-bottom: 1px solid var(--border-subtle); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; background: rgba(8, 14, 26, 0.3);">
-        <input type="text" id="filter-search" class="select-input" placeholder="Search IP, port, flow ID, notes..." style="flex: 1; min-width: 240px;" oninput="debounceSearch()">
+
+      <!-- Filters -->
+      <div class="term-filter-bar">
+        <input type="text" id="filter-search" class="term-search-input" placeholder="grep: IP, port, flow ID, protocol, notes..." oninput="debounceSearch()">
         
-        <select class="select-input" id="filter-status" onchange="loadAlerts()">
-          <option value="All">Status: All</option>
-          <option value="New">New</option>
-          <option value="Investigating">Investigating</option>
-          <option value="Confirmed Incident">Confirmed Incident</option>
-          <option value="False Positive">False Positive</option>
-          <option value="Resolved">Resolved</option>
+        <select class="term-select" id="filter-status" onchange="loadAlerts()">
+          <option value="All">STATUS: ALL</option>
+          <option value="New">STATUS: NEW</option>
+          <option value="Investigating">STATUS: INVESTIGATING</option>
+          <option value="Confirmed Incident">STATUS: CONFIRMED</option>
+          <option value="False Positive">STATUS: FALSE_POS</option>
+          <option value="Resolved">STATUS: RESOLVED</option>
         </select>
 
-        <select class="select-input" id="filter-class" onchange="loadAlerts()">
-          <option value="All">Class: All</option>
+        <select class="term-select" id="filter-class" onchange="loadAlerts()">
+          <option value="All">CLASS: ALL</option>
         </select>
 
-        <label class="checkbox-label">
+        <label class="term-check">
           <input type="checkbox" id="filter-anomaly" onchange="loadAlerts()">
-          <span>Outliers Only</span>
+          <span>OUTLIERS_ONLY</span>
         </label>
       </div>
 
-      <!-- Triage Table -->
-      <div class="table-container">
-        <table class="triage-table">
+      <!-- Table -->
+      <div class="term-table-wrap">
+        <table class="term-table">
           <thead>
             <tr>
-              <th>ID / Timestamp (UTC)</th>
-              <th>5-Tuple Connection</th>
-              <th>Threat Classification</th>
-              <th>Confidence</th>
-              <th>Anomaly Score</th>
-              <th>Status</th>
-              <th>Action</th>
+              <th>ID // TIMESTAMP_UTC</th>
+              <th>5-TUPLE CONVERSATION</th>
+              <th>CLASSIFICATION</th>
+              <th>CONFIDENCE</th>
+              <th>ANOMALY_SCORE</th>
+              <th>STATUS</th>
+              <th>ACTION</th>
             </tr>
           </thead>
           <tbody id="alerts-tbody">
             <tr>
-              <td colspan="7" style="text-align: center; padding: 24px; color: var(--text-dim);">No alerts registered yet.</td>
+              <td colspan="7" style="text-align: center; padding: 20px; color: var(--text-dim);">No alerts registered in database.</td>
             </tr>
           </tbody>
         </table>
@@ -1048,54 +1049,54 @@
 
   </main>
 
-  <!-- ── 7. Forensic Detail Modal ─────────────────────────────────────────── -->
-  <div class="modal-overlay" id="triage-modal" onclick="handleModalOverlayClick(event)">
-    <div class="modal-box">
-      <div class="modal-header">
-        <span class="modal-title" id="modal-title">Forensic Alert Dossier</span>
-        <button class="btn-outline" onclick="closeModal()">Close</button>
+  <!-- ── 7. Forensic Detail Modal ──────────────────────────────────────── -->
+  <div class="term-modal-overlay" id="triage-modal" onclick="handleModalOverlayClick(event)">
+    <div class="term-modal">
+      <div class="term-modal-header">
+        <span id="modal-title">[ FORENSIC_ALERT_DOSSIER ]</span>
+        <button class="term-btn" onclick="closeModal()">[ ESC ]</button>
       </div>
-      <div class="modal-body">
-        
-        <div class="dossier-grid">
+
+      <div class="term-modal-body">
+        <div class="term-dossier-grid">
           <div>
-            <div class="dossier-item-label">ALERT ID</div>
-            <div class="dossier-item-val" id="m-id">-</div>
+            <div class="dossier-label">RECORD_ID</div>
+            <div class="dossier-val" id="m-id">-</div>
           </div>
           <div>
-            <div class="dossier-item-label">RECORD TIMESTAMP</div>
-            <div class="dossier-item-val" id="m-time">-</div>
+            <div class="dossier-label">TIMESTAMP_UTC</div>
+            <div class="dossier-val" id="m-time">-</div>
           </div>
           <div>
-            <div class="dossier-item-label">SOCKET 5-TUPLE</div>
-            <div class="dossier-item-val" id="m-socket">-</div>
+            <div class="dossier-label">5_TUPLE_SOCKET</div>
+            <div class="dossier-val" id="m-socket">-</div>
           </div>
           <div>
-            <div class="dossier-item-label">TRANSPORT PROTOCOL</div>
-            <div class="dossier-item-val" id="m-proto">-</div>
+            <div class="dossier-label">PROTOCOL_TAG</div>
+            <div class="dossier-val" id="m-proto">-</div>
           </div>
           <div>
-            <div class="dossier-item-label">PREDICTED THREAT CLASS</div>
-            <div class="dossier-item-val" id="m-class">-</div>
+            <div class="dossier-label">PREDICTED_CLASS</div>
+            <div class="dossier-val" id="m-class">-</div>
           </div>
           <div>
-            <div class="dossier-item-label">MODEL CONFIDENCE & SCORE</div>
-            <div class="dossier-item-val" id="m-conf">-</div>
+            <div class="dossier-label">MODEL_CONFIDENCE</div>
+            <div class="dossier-val" id="m-conf">-</div>
           </div>
         </div>
 
-        <!-- XAI Feature Attributions -->
-        <div class="xai-box">
-          <div class="xai-title">Feature Attribution & Driving Factors</div>
-          <div id="m-xai-content" class="xai-list">
+        <!-- XAI -->
+        <div class="term-xai-box">
+          <div class="term-xai-title">// EXPLAINABLE_AI: FEATURE ATTRIBUTIONS</div>
+          <div id="m-xai-content" style="font-size: 11px; color: var(--text-muted); line-height: 1.6;">
             <div>No local feature attributions stored for this flow.</div>
           </div>
         </div>
 
-        <!-- In-Place Status & Notes Updater -->
+        <!-- Status & Notes -->
         <div>
-          <label class="dossier-item-label">UPDATE LIFECYCLE STATUS</label>
-          <select class="select-input" id="m-status-select" style="width: 100%; margin-top: 4px; margin-bottom: 12px;">
+          <div class="dossier-label">UPDATE LIFECYCLE STATE:</div>
+          <select class="term-select" id="m-status-select" style="width: 100%; margin-top: 4px; margin-bottom: 10px;">
             <option value="New">New (Unconfirmed Hypothesis)</option>
             <option value="Investigating">Investigating (Under Forensic Review)</option>
             <option value="Confirmed Incident">Confirmed Incident (Escalated Threat)</option>
@@ -1103,48 +1104,30 @@
             <option value="Resolved">Resolved (Mitigated / Closed)</option>
           </select>
 
-          <label class="dossier-item-label">ANALYST INVESTIGATION NOTES</label>
-          <textarea class="textarea-notes" id="m-notes-input" placeholder="Record host correlations, firewall actions, or verification rationale..."></textarea>
+          <div class="dossier-label">ANALYST INVESTIGATION NOTES:</div>
+          <textarea class="term-textarea" id="m-notes-input" placeholder="Record host correlations, firewall actions, or verification rationale..."></textarea>
         </div>
-
       </div>
-      <div class="modal-footer">
-        <button class="btn-outline" onclick="closeModal()">Cancel</button>
-        <button class="btn-primary" onclick="saveAlertStatus()">Save Triage Record</button>
+
+      <div class="term-modal-footer">
+        <button class="term-btn" onclick="closeModal()">[ CANCEL ]</button>
+        <button class="term-btn term-btn-primary" onclick="saveAlertStatus()">[ COMMIT STATUS ]</button>
       </div>
     </div>
   </div>
 
-  <!-- ── 8. System Footer ─────────────────────────────────────────────────── -->
-  <footer class="site-footer">
-    <div class="footer-grid">
-      <div>
-        <div class="footer-col-title">Privacy Assurance</div>
-        <p class="footer-col-text">
-          Operates strictly on statistical flow metadata (5-tuples, packet counters, timing metrics). No packet payloads, user credentials, or application data are ever captured or stored.
-        </p>
-      </div>
-      <div>
-        <div class="footer-col-title">Operational Notice</div>
-        <p class="footer-col-text">
-          Machine learning detections and anomaly scores represent risk hypotheses. Every alert requires analyst verification before escalation to confirmed incident status.
-        </p>
-      </div>
-      <div>
-        <div class="footer-col-title">Local Execution</div>
-        <p class="footer-col-text">
-          100% offline local runtime executing on host hardware. Zero external cloud API calls or paid dependencies.
-        </p>
-      </div>
-    </div>
+  <!-- ── 8. Terminal Footer ────────────────────────────────────────────── -->
+  <footer class="term-footer">
+    <div>AI-NIDS CONSOLE // PASSIVE TRAFFIC MONITOR // 100% OFFLINE LOCALHOST</div>
+    <div>METADATA ONLY: ZERO APPLICATION PAYLOAD SERIALIZATION</div>
+    <div>ZERO CLOUD DEPENDENCY CERTIFIED: &#8377;0 COST</div>
   </footer>
 
   <!-- Toast Notification -->
-  <div id="toast" class="toast-box"></div>
+  <div id="toast" class="term-toast"></div>
 
-  <!-- ── Frontend Application Logic ───────────────────────────────────────── -->
+  <!-- ── Application Logic ─────────────────────────────────────────────── -->
   <script>
-    // State
     let activeTab = 'csv';
     let selectedFile = null;
     let currentSelectedAlertId = null;
@@ -1154,27 +1137,37 @@
     let searchDebounceTimer = null;
     let chartsInitialized = false;
 
-    // Initialization
     document.addEventListener('DOMContentLoaded', () => {
       loadStats();
       setupDragAndDrop();
+      startClock();
     });
+
+    function startClock() {
+      function update() {
+        const now = new Date();
+        const d = now.toISOString().replace('T', ' ').slice(0, 19);
+        const clockEl = document.getElementById('term-clock');
+        if (clockEl) clockEl.textContent = `UTC ${d}`;
+      }
+      update();
+      setInterval(update, 1000);
+    }
 
     function showToast(message) {
       const toast = document.getElementById('toast');
-      toast.textContent = message;
+      toast.textContent = `>> ${message}`;
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 3500);
     }
 
-    function toggleTheme() {
-      const isDark = document.documentElement.classList.toggle('dark');
-      document.documentElement.classList.toggle('light', !isDark);
-      const btn = document.getElementById('theme-btn');
-      if (btn) btn.textContent = isDark ? 'Light Theme' : 'Dark Theme';
-      if (chartsInitialized) {
-        initCharts();
-        updateCharts();
+    let stagedSampleType = null;
+
+    function triggerFileInput(type) {
+      const input = document.getElementById(`${type}-file-input`);
+      if (input) {
+        input.value = '';
+        input.click();
       }
     }
 
@@ -1184,27 +1177,43 @@
       document.getElementById('tab-pcap-btn').classList.toggle('active', mode === 'pcap');
       document.getElementById('dropzone-csv').style.display = mode === 'csv' ? 'block' : 'none';
       document.getElementById('dropzone-pcap').style.display = mode === 'pcap' ? 'block' : 'none';
-      selectedFile = null;
-      document.getElementById('csv-file-name').textContent = '';
-      document.getElementById('pcap-file-name').textContent = '';
-      document.getElementById('ingest-status').textContent = 'Ready';
+      if (!selectedFile && !stagedSampleType) {
+        document.getElementById('ingest-status').textContent = 'READY';
+      }
     }
 
     function setupDragAndDrop() {
+      // Prevent browser from navigating to dropped file
+      window.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); });
+      window.addEventListener('drop', (e) => { e.preventDefault(); e.stopPropagation(); });
+
       ['csv', 'pcap'].forEach(type => {
         const zone = document.getElementById(`dropzone-${type}`);
+        if (!zone) return;
+
         ['dragenter', 'dragover'].forEach(name => {
-          zone.addEventListener(name, (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+          zone.addEventListener(name, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            zone.classList.add('dragover');
+          });
         });
-        ['dragleave', 'drop'].forEach(name => {
-          zone.addEventListener(name, (e) => { e.preventDefault(); zone.classList.remove('dragover'); });
+
+        ['dragleave'].forEach(name => {
+          zone.addEventListener(name, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            zone.classList.remove('dragover');
+          });
         });
+
         zone.addEventListener('drop', (e) => {
-          const files = e.dataTransfer.files;
+          e.preventDefault();
+          e.stopPropagation();
+          zone.classList.remove('dragover');
+          const files = e.dataTransfer ? e.dataTransfer.files : null;
           if (files && files.length > 0) {
-            selectedFile = files[0];
-            document.getElementById(`${type}-file-name`).textContent = `Selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)`;
-            document.getElementById('ingest-status').textContent = 'File Ready';
+            setStagedFile(files[0], type);
           }
         });
       });
@@ -1212,13 +1221,45 @@
 
     function handleFileSelect(e, type) {
       if (e.target.files && e.target.files.length > 0) {
-        selectedFile = e.target.files[0];
-        document.getElementById(`${type}-file-name`).textContent = `Selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)`;
-        document.getElementById('ingest-status').textContent = 'File Ready';
+        setStagedFile(e.target.files[0], type);
       }
     }
 
-    // ── Dynamic Section Visibility (Hidden before upload) ─────────────────
+    function setStagedFile(file, type) {
+      if (!file) return;
+      selectedFile = file;
+      stagedSampleType = null;
+
+      document.getElementById(`${type}-prompt-box`).style.display = 'none';
+      const stagedBox = document.getElementById(`${type}-staged-box`);
+      stagedBox.style.display = 'flex';
+      document.getElementById(`${type}-file-name`).textContent = `${file.name} [${(file.size / 1024).toFixed(1)} KB]`;
+      document.getElementById('ingest-status').textContent = 'FILE_STAGED';
+      
+      const feedback = document.getElementById('ingest-feedback');
+      feedback.style.display = 'block';
+      feedback.innerHTML = `&gt;&gt; STAGED FILE: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB). Click <strong>[ RUN INFERENCE ]</strong> to analyze.`;
+      showToast(`Staged file: ${file.name}`);
+    }
+
+    function unstageFile(e, type) {
+      if (e) e.stopPropagation();
+      selectedFile = null;
+      stagedSampleType = null;
+
+      const input = document.getElementById(`${type}-file-input`);
+      if (input) input.value = '';
+
+      document.getElementById(`${type}-prompt-box`).style.display = 'block';
+      document.getElementById(`${type}-staged-box`).style.display = 'none';
+      document.getElementById(`${type}-file-name`).textContent = '';
+      document.getElementById('ingest-status').textContent = 'READY';
+
+      const feedback = document.getElementById('ingest-feedback');
+      feedback.style.display = 'none';
+      showToast('File unstaged');
+    }
+
     function updateVisibility(hasData) {
       const emptyState = document.getElementById('empty-state-section');
       const kpiSec = document.getElementById('kpi-section');
@@ -1243,7 +1284,6 @@
       }
     }
 
-    // ── Load Stats & KPI Cards ─────────────────────────────────────────────
     async function loadStats() {
       try {
         const res = await fetch('/api/stats');
@@ -1259,11 +1299,10 @@
           document.getElementById('kpi-anomalies').textContent = data.anomaly_count.toLocaleString();
           document.getElementById('kpi-latency').textContent = `${data.avg_latency_ms.toFixed(1)} ms`;
 
-          // Populate Class dropdown
           const classFilter = document.getElementById('filter-class');
           const currentSelected = classFilter.value;
           const classes = Object.keys(data.by_class || {});
-          let html = '<option value="All">Class: All</option>';
+          let html = '<option value="All">CLASS: ALL</option>';
           classes.forEach(c => {
             html += `<option value="${c}">${c.toUpperCase()}</option>`;
           });
@@ -1278,7 +1317,6 @@
       }
     }
 
-    // ── Load Alerts Grid ───────────────────────────────────────────────────
     async function loadAlerts() {
       const search = document.getElementById('filter-search').value.trim();
       const status = document.getElementById('filter-status').value;
@@ -1303,13 +1341,13 @@
 
     function debounceSearch() {
       clearTimeout(searchDebounceTimer);
-      searchDebounceTimer = setTimeout(loadAlerts, 250);
+      searchDebounceTimer = setTimeout(loadAlerts, 200);
     }
 
     function renderAlertsTable(alerts) {
       const tbody = document.getElementById('alerts-tbody');
       if (!alerts || alerts.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 24px; color: var(--text-dim);">No matching records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--text-dim);">No matching records found in database.</td></tr>`;
         return;
       }
 
@@ -1317,11 +1355,11 @@
         const isBenign = (a.predicted_class || '').toLowerCase() === 'benign';
         const isAnomaly = a.is_anomaly === 1;
         
-        let classBadge = `<span class="tag-badge tag-threat">${(a.predicted_class || 'UNKNOWN').toUpperCase()}</span>`;
+        let classBadge = `<span class="term-tag tag-threat">${(a.predicted_class || 'UNKNOWN').toUpperCase()}</span>`;
         if (isBenign && !isAnomaly) {
-          classBadge = `<span class="tag-badge tag-benign">BENIGN</span>`;
+          classBadge = `<span class="term-tag tag-benign">BENIGN</span>`;
         } else if (isAnomaly && isBenign) {
-          classBadge = `<span class="tag-badge tag-anomaly">ANOMALY [BENIGN]</span>`;
+          classBadge = `<span class="term-tag tag-anomaly">ANOMALY [BENIGN]</span>`;
         }
 
         let statusClass = 'tag-new';
@@ -1336,39 +1374,55 @@
         return `
           <tr onclick="openModal(${a.id})">
             <td>
-              <div style="font-weight: 600;">#${a.id}</div>
-              <div style="color: var(--text-dim); font-size: 11px;">${(a.timestamp || '').replace('T', ' ').slice(0, 19)}</div>
+              <div style="font-weight: 700; color: var(--term-cyan);">#${a.id}</div>
+              <div style="color: var(--text-dim); font-size: 10px;">${(a.timestamp || '').replace('T', ' ').slice(0, 19)}</div>
             </td>
             <td>
               <div>${a.src_ip}:${a.src_port} &rarr; ${a.dst_ip}:${a.dst_port}</div>
-              <div style="color: var(--text-dim); font-size: 11px;">${a.protocol || 'IP'} // ${a.flow_id || 'FLOW'}</div>
+              <div style="color: var(--text-dim); font-size: 10px;">${a.protocol || 'IP'} // ${a.flow_id || 'FLOW'}</div>
             </td>
             <td>${classBadge}</td>
             <td>
-              <div class="conf-bar-wrapper">
-                <div class="conf-bar"><div class="conf-bar-fill" style="width: ${conf}%;"></div></div>
-                <span>${conf}%</span>
+              <div class="term-conf-bar">
+                <div class="term-conf-track"><div class="term-conf-fill" style="width: ${conf}%;"></div></div>
+                <span style="font-size: 11px;">${conf}%</span>
               </div>
             </td>
             <td>
-              <span style="${isAnomaly ? 'color: var(--accent-violet); font-weight: 600;' : 'color: var(--text-dim);'}">${anomScore}</span>
+              <span style="${isAnomaly ? 'color: var(--term-purple); font-weight: 700;' : 'color: var(--text-dim);'}">${anomScore}</span>
             </td>
             <td>
-              <span class="tag-badge ${statusClass}">${(a.status || 'NEW').toUpperCase()}</span>
+              <span class="term-tag ${statusClass}">${(a.status || 'NEW').toUpperCase()}</span>
             </td>
             <td>
-              <button class="btn-outline" style="padding: 3px 8px; font-size: 10px;" onclick="event.stopPropagation(); openModal(${a.id});">Inspect</button>
+              <button class="term-btn" style="padding: 2px 6px; font-size: 10px;" onclick="event.stopPropagation(); openModal(${a.id});">[ INSPECT ]</button>
             </td>
           </tr>
         `;
       }).join('');
     }
 
-    // ── Ingestion Handlers ────────────────────────────────────────────────
     async function loadSampleCSV() {
+      // Stage sample in CSV dropzone
+      switchTab('csv');
+      stagedSampleType = 'csv';
+      selectedFile = null;
+
+      document.getElementById('csv-prompt-box').style.display = 'none';
+      const stagedBox = document.getElementById('csv-staged-box');
+      stagedBox.style.display = 'flex';
+      document.getElementById('csv-file-name').textContent = 'data/sample_features.csv [250 flows, 66 features, benchmark set]';
+      document.getElementById('ingest-status').textContent = 'BENCHMARK_STAGED';
+
       const feedback = document.getElementById('ingest-feedback');
       feedback.style.display = 'block';
-      feedback.textContent = 'Evaluating network flow models on sample CSV...';
+      feedback.innerHTML = '&gt;&gt; [1/2] EVALUATING 250 FLOWS FROM BUNDLED BENCHMARK WITH MACHINE LEARNING PIPELINE...';
+
+      const btn = document.getElementById('btn-execute');
+      const btnSample = document.getElementById('btn-load-sample-csv');
+      btn.disabled = true;
+      btnSample.disabled = true;
+      btn.textContent = '[ EVALUATING 250 FLOWS... ]';
 
       const formData = new FormData();
       formData.append('model_type', document.getElementById('model-select').value);
@@ -1385,22 +1439,48 @@
           throw new Error(`Server returned HTTP ${res.status}: ${text.slice(0, 120)}`);
         }
         if (data.success) {
-          feedback.innerHTML = `Successfully evaluated ${data.rows_evaluated} flows in ${data.processing_time_seconds}s (${data.avg_latency_ms} ms/flow). Recorded ${data.alerts_registered} alert(s).`;
+          feedback.innerHTML = `
+            <div>&gt;&gt; <strong>BENCHMARK INGESTION COMPLETE</strong></div>
+            <div>[+] FLOWS EVALUATED: <strong>${data.rows_evaluated}</strong> in ${data.processing_time_seconds}s (${data.avg_latency_ms} ms/flow)</div>
+            <div>[+] THREAT BREAKDOWN: <strong>${data.threat_count}</strong> detected threats, <strong>${data.benign_count}</strong> benign flows</div>
+            <div>[+] ANOMALIES IDENTIFIED: <strong>${data.anomaly_count}</strong> Isolation Forest statistical outliers</div>
+            <div>[+] PERSISTENCE: <strong>${data.alerts_registered}</strong> threat alerts registered into SQLite database</div>
+          `;
           updateVisibility(true);
           await loadStats();
-          showToast(`Ingested ${data.rows_evaluated} flows from sample CSV`);
+          showToast(`Ingested & evaluated ${data.rows_evaluated} flows from sample CSV`);
         } else {
-          feedback.textContent = `Error: ${data.detail || data.error || data.message || 'Inference execution failed.'}`;
+          feedback.innerHTML = `&gt;&gt; ERROR: ${data.detail || data.error || data.message || 'Inference execution failed.'}`;
         }
       } catch (err) {
-        feedback.textContent = `Error: ${err.message || err}`;
+        feedback.innerHTML = `&gt;&gt; NETWORK_ERROR: ${err.message || err}`;
+      } finally {
+        btn.disabled = false;
+        btnSample.disabled = false;
+        btn.textContent = '[ RUN INFERENCE ]';
       }
     }
 
     async function loadSamplePCAP() {
+      switchTab('pcap');
+      stagedSampleType = 'pcap';
+      selectedFile = null;
+
+      document.getElementById('pcap-prompt-box').style.display = 'none';
+      const stagedBox = document.getElementById('pcap-staged-box');
+      stagedBox.style.display = 'flex';
+      document.getElementById('pcap-file-name').textContent = 'sample_network_traffic.pcap [RFC-compliant traffic trace]';
+      document.getElementById('ingest-status').textContent = 'CAPTURE_STAGED';
+
       const feedback = document.getElementById('ingest-feedback');
       feedback.style.display = 'block';
-      feedback.textContent = 'Dissecting packets in sample PCAP trace...';
+      feedback.innerHTML = '&gt;&gt; [1/2] DISSECTING PACKET TRACE IN SAMPLE_NETWORK_TRAFFIC.PCAP...';
+
+      const btn = document.getElementById('btn-execute');
+      const btnSample = document.getElementById('btn-load-sample-pcap');
+      btn.disabled = true;
+      btnSample.disabled = true;
+      btn.textContent = '[ DISSECTING PCAP... ]';
 
       const formData = new FormData();
       formData.append('model_type', document.getElementById('model-select').value);
@@ -1418,31 +1498,51 @@
         }
         if (data.success) {
           const telem = data.telemetry || {};
-          feedback.innerHTML = `Successfully parsed ${telem.packets_read || 0} packets into ${telem.flows_reconstructed || 0} flows in ${telem.total_time_seconds || 0}s. Recorded ${data.alerts_registered} alerts.`;
+          feedback.innerHTML = `
+            <div>&gt;&gt; <strong>PCAP STREAM DISSECTION COMPLETE</strong></div>
+            <div>[+] PACKETS PARSED: <strong>${telem.packets_read || 0}</strong> &rarr; <strong>${telem.flows_reconstructed || 0}</strong> bi-directional flows</div>
+            <div>[+] THROUGHPUT: <strong>${telem.throughput_packets_per_sec || 0}</strong> packets/sec in ${telem.total_time_seconds || 0}s</div>
+            <div>[+] THREAT BREAKDOWN: <strong>${data.threat_count || 0}</strong> malicious flows flagged</div>
+            <div>[+] PERSISTENCE: <strong>${data.alerts_registered}</strong> alerts registered into SQLite database</div>
+          `;
           updateVisibility(true);
           await loadStats();
-          showToast(`Ingested PCAP packet trace: ${telem.flows_reconstructed || 0} flows reconstructed`);
+          showToast(`Ingested PCAP: ${telem.flows_reconstructed || 0} flows reconstructed`);
         } else {
-          feedback.textContent = `Error: ${data.detail || data.error || data.message || 'PCAP execution failed.'}`;
+          feedback.innerHTML = `&gt;&gt; ERROR: ${data.detail || data.error || data.message || 'PCAP processing failed.'}`;
         }
       } catch (err) {
-        feedback.textContent = `Error: ${err.message || err}`;
+        feedback.innerHTML = `&gt;&gt; NETWORK_ERROR: ${err.message || err}`;
+      } finally {
+        btn.disabled = false;
+        btnSample.disabled = false;
+        btn.textContent = '[ RUN INFERENCE ]';
       }
     }
 
     async function executeInference() {
+      // If sample is staged and no custom file was dropped, run sample
       if (!selectedFile) {
-        showToast('Please select or drop a CSV or PCAP file first');
-        return;
+        if (stagedSampleType === 'csv') {
+          return loadSampleCSV();
+        } else if (stagedSampleType === 'pcap') {
+          return loadSamplePCAP();
+        } else {
+          showToast('SELECT FILE OR CLICK [ LOAD SAMPLE CSV ] FIRST');
+          const feedback = document.getElementById('ingest-feedback');
+          feedback.style.display = 'block';
+          feedback.innerHTML = '&gt;&gt; <strong>WARNING</strong>: No data stream staged. Click <strong>[ LOAD SAMPLE CSV ]</strong> or select a file to evaluate.';
+          return;
+        }
       }
 
       const btn = document.getElementById('btn-execute');
       btn.disabled = true;
-      btn.textContent = 'Analyzing...';
+      btn.textContent = '[ EXECUTING... ]';
 
       const feedback = document.getElementById('ingest-feedback');
       feedback.style.display = 'block';
-      feedback.textContent = `Processing ${selectedFile.name}...`;
+      feedback.innerHTML = `&gt;&gt; INGESTING &amp; ANALYZING: <strong>${selectedFile.name}</strong>...`;
 
       const formData = new FormData();
       formData.append('file', selectedFile);
@@ -1462,61 +1562,67 @@
           throw new Error(`Server returned HTTP ${res.status}: ${text.slice(0, 120)}`);
         }
         if (res.ok && data.success) {
-          feedback.innerHTML = `Analysis complete: Registered ${data.alerts_registered} threat alert(s) into database.`;
+          feedback.innerHTML = `
+            <div>&gt;&gt; <strong>ANALYSIS COMPLETE: ${selectedFile.name}</strong></div>
+            <div>[+] FLOWS EVALUATED: <strong>${data.rows_evaluated || (data.telemetry && data.telemetry.flows_reconstructed) || 0}</strong> in ${data.processing_time_seconds || (data.telemetry && data.telemetry.total_time_seconds) || 0}s</div>
+            <div>[+] THREAT BREAKDOWN: <strong>${data.threat_count || 0}</strong> threats detected, <strong>${data.benign_count || 0}</strong> benign</div>
+            <div>[+] PERSISTENCE: <strong>${data.alerts_registered || 0}</strong> threat alerts registered into SQLite alerts.db</div>
+          `;
           updateVisibility(true);
           await loadStats();
           showToast(`Analysis complete: ${data.alerts_registered} alerts registered`);
         } else {
-          const errMsg = data.message ? `${data.error}: ${data.message}` : (data.detail || data.error || 'Failed');
-          const errDetail = typeof errMsg === 'object' ? JSON.stringify(errMsg) : errMsg;
-          feedback.textContent = `Error: ${errDetail}`;
+          let errDetail = data.message || data.error || data.detail || 'Ingestion execution error';
+          if (data.missing_features && Array.isArray(data.missing_features)) {
+            errDetail += `<br><span style="color: var(--text-dim);">Missing features (${data.missing_features.length}): ${data.missing_features.join(', ')}</span>`;
+          }
+          feedback.innerHTML = `&gt;&gt; ERROR: ${errDetail}`;
           showToast('Ingestion error encountered');
         }
       } catch (err) {
-        feedback.textContent = `Error: ${err.message || err}`;
+        feedback.innerHTML = `&gt;&gt; NETWORK_ERROR: ${err.message || err}`;
+      }
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Analyze Traffic';
+        btn.textContent = '[ RUN INFERENCE ]';
       }
     }
 
     async function clearData() {
-      if (!confirm('Are you sure you want to clear all ingested alerts and reset the dashboard?')) return;
+      if (!confirm('CONFIRM PURGE: Clear all ingested alerts and reset the telemetry store?')) return;
       try {
         const res = await fetch('/api/alerts/clear', { method: 'POST' });
         const data = await res.json();
         if (data.success) {
-          showToast('All ingested alert records cleared');
+          showToast('All alert records purged successfully');
           document.getElementById('ingest-feedback').style.display = 'none';
           loadStats();
         }
       } catch (err) {
-        showToast('Failed to clear data');
+        showToast('ERROR: Failed to purge database');
       }
     }
 
-    // ── Forensic Modal Inspection ──────────────────────────────────────────
     async function openModal(alertId) {
       currentSelectedAlertId = alertId;
       try {
         const res = await fetch(`/api/alerts/${alertId}`);
         const alert = await res.json();
 
-        document.getElementById('modal-title').textContent = `Forensic Alert Dossier #${alert.id}`;
+        document.getElementById('modal-title').textContent = `[ FORENSIC_ALERT_DOSSIER // ID: #${alert.id} ]`;
         document.getElementById('m-id').textContent = `#${alert.id}`;
         document.getElementById('m-time').textContent = (alert.timestamp || '').replace('T', ' ');
         document.getElementById('m-socket').textContent = `${alert.src_ip}:${alert.src_port} \u2192 ${alert.dst_ip}:${alert.dst_port}`;
         document.getElementById('m-proto').textContent = `${alert.protocol || 'IP'} [${alert.flow_id || '-'}]`;
         document.getElementById('m-class').textContent = (alert.predicted_class || 'UNKNOWN').toUpperCase();
-        document.getElementById('m-conf').textContent = `${alert.confidence_score ? (alert.confidence_score * 100).toFixed(1) + '%' : '-'} (Model: ${alert.model_version || 'v1'})`;
+        document.getElementById('m-conf').textContent = `${alert.confidence_score ? (alert.confidence_score * 100).toFixed(1) + '%' : '-'} (${alert.model_version || 'v1'})`;
 
-        // Render XAI
         const xaiContainer = document.getElementById('m-xai-content');
         const parsed = alert.explanation_parsed;
         if (parsed && typeof parsed === 'object') {
           if (parsed.top_features && Array.isArray(parsed.top_features)) {
             xaiContainer.innerHTML = parsed.top_features.map(f => `
-              <div>&bull; <strong style="color: #ffffff;">${f.feature}</strong>: val=${typeof f.feature_value === 'number' ? f.feature_value.toFixed(2) : f.feature_value} (impact: ${f.impact_direction || '+'})</div>
+              <div>&bull; <strong style="color: var(--term-green);">${f.feature}</strong>: val=${typeof f.feature_value === 'number' ? f.feature_value.toFixed(2) : f.feature_value} (impact: ${f.impact_direction || '+'})</div>
             `).join('');
           } else {
             xaiContainer.innerHTML = `<div>${JSON.stringify(parsed)}</div>`;
@@ -1525,13 +1631,12 @@
           xaiContainer.innerHTML = `<div>No local feature attributions stored for this flow.</div>`;
         }
 
-        // Set status and notes
         document.getElementById('m-status-select').value = alert.status || 'New';
         document.getElementById('m-notes-input').value = alert.analyst_notes || '';
 
         document.getElementById('triage-modal').classList.add('active');
       } catch (err) {
-        showToast('Failed to load alert dossier');
+        showToast('ERROR: Failed to load alert dossier');
       }
     }
 
@@ -1557,34 +1662,31 @@
         });
         const data = await res.json();
         if (data.success) {
-          showToast(`Alert #${currentSelectedAlertId} updated to ${status}`);
+          showToast(`Alert #${currentSelectedAlertId} committed -> ${status}`);
           closeModal();
           loadStats();
           loadAlerts();
         } else {
-          showToast('Failed to update alert status');
+          showToast('ERROR: Status update rejected');
         }
       } catch (err) {
-        showToast('Error saving alert status');
+        showToast('ERROR: Failed to save status');
       }
     }
 
-    // ── Export Sanitized CSV ───────────────────────────────────────────────
     function exportSanitizedCSV() {
       window.location.href = '/api/export/csv';
       showToast('Exporting sanitized CSV report...');
     }
 
-    // ── Offline Chart.js Telemetry Initializer ─────────────────────────────
     function initCharts() {
       if (typeof Chart === 'undefined') return;
 
-      const isLight = document.documentElement.classList.contains('light');
-      const textColor = isLight ? '#334155' : '#94a3b8';
-      const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)';
+      const textColor = '#8b949e';
+      const gridColor = 'rgba(255, 255, 255, 0.05)';
 
       Chart.defaults.color = textColor;
-      Chart.defaults.font.family = "'JetBrains Mono', monospace";
+      Chart.defaults.font.family = "'JetBrains Mono', 'Fira Code', monospace";
       Chart.defaults.font.size = 10;
 
       // 1. Attack Breakdown Chart
@@ -1597,18 +1699,18 @@
             labels: ['Awaiting Data'],
             datasets: [{
               data: [1],
-              backgroundColor: ['rgba(59, 130, 246, 0.5)'],
-              borderColor: 'transparent',
-              borderWidth: 1
+              backgroundColor: ['#1f2530'],
+              borderColor: '#0c0e12',
+              borderWidth: 2
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: { position: 'right', labels: { boxWidth: 10, padding: 8 } }
+              legend: { position: 'right', labels: { boxWidth: 8, padding: 6, color: '#8b949e' } }
             },
-            cutout: '65%'
+            cutout: '70%'
           }
         });
       }
@@ -1620,18 +1722,19 @@
         chartLifecycle = new Chart(ctxLifecycle.getContext('2d'), {
           type: 'bar',
           data: {
-            labels: ['New', 'Investigating', 'Confirmed', 'False Pos', 'Resolved'],
+            labels: ['NEW', 'INVESTIGATING', 'CONFIRMED', 'FALSE_POS', 'RESOLVED'],
             datasets: [{
               label: 'Alerts',
               data: [0, 0, 0, 0, 0],
               backgroundColor: [
-                'rgba(245, 158, 11, 0.7)',
-                'rgba(59, 130, 246, 0.7)',
-                'rgba(239, 68, 68, 0.7)',
-                'rgba(148, 163, 184, 0.7)',
-                'rgba(16, 185, 129, 0.7)'
+                '#ffb800',
+                '#00f0ff',
+                '#ff3855',
+                '#8b949e',
+                '#00ff66'
               ],
-              borderRadius: 3
+              borderWidth: 0,
+              borderRadius: 0
             }]
           },
           options: {
@@ -1639,26 +1742,27 @@
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-              x: { grid: { display: false } },
-              y: { grid: { color: gridColor }, beginAtZero: true }
+              x: { grid: { display: false }, ticks: { color: '#8b949e' } },
+              y: { grid: { color: gridColor }, beginAtZero: true, ticks: { color: '#8b949e' } }
             }
           }
         });
       }
 
-      // 3. Empirical Latency Chart
+      // 3. Latency Chart
       const ctxLatency = document.getElementById('chart-latency');
       if (ctxLatency) {
         if (chartLatency) chartLatency.destroy();
         chartLatency = new Chart(ctxLatency.getContext('2d'), {
           type: 'bar',
           data: {
-            labels: ['Binary', 'Multiclass', 'Anomaly', 'Surrogate XAI'],
+            labels: ['BINARY', 'MULTICLASS', 'ANOMALY', 'SURROGATE_XAI'],
             datasets: [{
               label: 'Latency (ms)',
               data: [10.7, 10.9, 30.1, 14.1],
-              backgroundColor: 'rgba(59, 130, 246, 0.65)',
-              borderRadius: 3
+              backgroundColor: '#00ff66',
+              borderWidth: 0,
+              borderRadius: 0
             }]
           },
           options: {
@@ -1667,21 +1771,19 @@
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-              x: { grid: { color: gridColor }, beginAtZero: true },
-              y: { grid: { display: false } }
+              x: { grid: { color: gridColor }, beginAtZero: true, ticks: { color: '#8b949e' } },
+              y: { grid: { display: false }, ticks: { color: '#8b949e' } }
             }
           }
         });
       }
     }
 
-    // ── Update Charts with API Data ────────────────────────────────────────
     async function updateCharts() {
       try {
         const res = await fetch('/api/chart-data');
         const data = await res.json();
 
-        // 1. Update Attack Categories
         if (chartAttacks && data.attack_breakdown) {
           const ab = data.attack_breakdown;
           const labels = Array.isArray(ab.labels) ? ab.labels : Object.keys(ab);
@@ -1690,29 +1792,27 @@
             chartAttacks.data.labels = labels.map(l => String(l).toUpperCase());
             chartAttacks.data.datasets[0].data = values;
             chartAttacks.data.datasets[0].backgroundColor = [
-              '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6', '#f97316', '#6366f1'
+              '#00ff66', '#00f0ff', '#ffb800', '#ff3855', '#c084fc', '#f43f5e', '#38bdf8', '#10b981', '#fb923c', '#818cf8'
             ];
             chartAttacks.update();
           }
         }
 
-        // 2. Update Lifecycle Chart
         if (chartLifecycle && data.lifecycle_distribution) {
           const ld = data.lifecycle_distribution;
           const labels = Array.isArray(ld.labels) ? ld.labels : Object.keys(ld);
           const values = Array.isArray(ld.values) ? ld.values : Object.values(ld);
           if (labels.length > 0 && values.length > 0) {
-            chartLifecycle.data.labels = labels;
+            chartLifecycle.data.labels = labels.map(l => String(l).toUpperCase());
             chartLifecycle.data.datasets[0].data = values;
             chartLifecycle.update();
           }
         }
 
-        // 3. Update Latency Chart
         if (chartLatency && data.performance_telemetry) {
           const pt = data.performance_telemetry;
           if (Array.isArray(pt.labels) && Array.isArray(pt.latencies_ms)) {
-            chartLatency.data.labels = pt.labels;
+            chartLatency.data.labels = pt.labels.map(l => String(l).toUpperCase());
             chartLatency.data.datasets[0].data = pt.latencies_ms;
             chartLatency.update();
           }
