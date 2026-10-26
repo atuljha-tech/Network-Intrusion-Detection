@@ -1576,7 +1576,6 @@
         }
       } catch (err) {
         feedback.innerHTML = `&gt;&gt; NETWORK_ERROR: ${err.message || err}`;
-      }
       } finally {
         btn.disabled = false;
         btn.textContent = '[ RUN INFERENCE ]';
