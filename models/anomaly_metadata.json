@@ -1,6 +1,6 @@
 {
   "model_type": "IsolationForest",
-  "training_date": "2026-10-25T22:58:52.124269",
+  "training_date": "2026-10-26T14:27:10.654370",
   "feature_names": [
     "flow_duration",
     "total_fwd_packets",
@@ -72,106 +72,8 @@
   "n_features": 66,
   "info": {
     "training_mode": "semi_supervised_benign_baseline",
-    "training_samples": 2399,
+    "training_samples": 7871,
     "contamination": 0.05,
-    "n_estimators": 100,
-    "fit_time_seconds": 0.36011481285095215,
-    "disclaimer": "DISCLAIMER: Anomaly detection identifies statistical outliers and behavioral deviations from training baselines. Anomaly scores and outlier flags DO NOT represent confirmed malicious attacks. Benign network anomalies (large backups, video streams, network reconfigurations) regularly trigger outlier flags, while stealthy, low-volume attacks may appear normal. Anomaly signals are purely diagnostic candidates for secondary triage and must not be treated as ground-truth attack classifications."
-  },
-  "evaluation": {
-    "disclaimer": "DISCLAIMER: Anomaly detection identifies statistical outliers and behavioral deviations from training baselines. Anomaly scores and outlier flags DO NOT represent confirmed malicious attacks. Benign network anomalies (large backups, video streams, network reconfigurations) regularly trigger outlier flags, while stealthy, low-volume attacks may appear normal. Anomaly signals are purely diagnostic candidates for secondary triage and must not be treated as ground-truth attack classifications.",
-    "auc_roc": 0.49428333333333335,
-    "auc_pr": 0.39388023942759565,
-    "total_test_samples": 1000,
-    "total_outliers_flagged": 51,
-    "overall_outlier_pct": 5.1,
-    "benign_samples": 600,
-    "benign_false_alarm_count": 34,
-    "benign_false_alarm_rate_pct": 5.67,
-    "malicious_samples": 400,
-    "malicious_flagged_count": 17,
-    "malicious_outlier_rate_pct": 4.25,
-    "per_class_outlier_analysis": {
-      "ddos": {
-        "support": 96,
-        "outliers_flagged": 3,
-        "outlier_rate_pct": 3.12,
-        "mean_anomaly_score": 0.4223
-      },
-      "benign": {
-        "support": 600,
-        "outliers_flagged": 34,
-        "outlier_rate_pct": 5.67,
-        "mean_anomaly_score": 0.4276
-      },
-      "portscan": {
-        "support": 29,
-        "outliers_flagged": 3,
-        "outlier_rate_pct": 10.34,
-        "mean_anomaly_score": 0.4325
-      },
-      "dos slowloris": {
-        "support": 21,
-        "outliers_flagged": 1,
-        "outlier_rate_pct": 4.76,
-        "mean_anomaly_score": 0.4353
-      },
-      "bot": {
-        "support": 42,
-        "outliers_flagged": 3,
-        "outlier_rate_pct": 7.14,
-        "mean_anomaly_score": 0.4289
-      },
-      "dos goldeneye": {
-        "support": 46,
-        "outliers_flagged": 1,
-        "outlier_rate_pct": 2.17,
-        "mean_anomaly_score": 0.4214
-      },
-      "dos hulk": {
-        "support": 85,
-        "outliers_flagged": 2,
-        "outlier_rate_pct": 2.35,
-        "mean_anomaly_score": 0.4234
-      },
-      "ftp-patator": {
-        "support": 26,
-        "outliers_flagged": 1,
-        "outlier_rate_pct": 3.85,
-        "mean_anomaly_score": 0.4347
-      },
-      "dos slowhttptest": {
-        "support": 31,
-        "outliers_flagged": 3,
-        "outlier_rate_pct": 9.68,
-        "mean_anomaly_score": 0.4326
-      },
-      "ssh-patator": {
-        "support": 17,
-        "outliers_flagged": 0,
-        "outlier_rate_pct": 0.0,
-        "mean_anomaly_score": 0.4294
-      },
-      "web attack - brute force": {
-        "support": 5,
-        "outliers_flagged": 0,
-        "outlier_rate_pct": 0.0,
-        "mean_anomaly_score": 0.4173
-      },
-      "heartbleed": {
-        "support": 2,
-        "outliers_flagged": 0,
-        "outlier_rate_pct": 0.0,
-        "mean_anomaly_score": 0.3615
-      }
-    }
-  },
-  "package_versions": {
-    "pandas": "2.2.3",
-    "numpy": "1.26.4",
-    "scikit-learn": "1.5.0",
-    "matplotlib": "3.11.2",
-    "joblib": "1.4.0"
-  },
-  "disclaimer": "DISCLAIMER: Anomaly detection identifies statistical outliers and behavioral deviations from training baselines. Anomaly scores and outlier flags DO NOT represent confirmed malicious attacks. Benign network anomalies (large backups, video streams, network reconfigurations) regularly trigger outlier flags, while stealthy, low-volume attacks may appear normal. Anomaly signals are purely diagnostic candidates for secondary triage and must not be treated as ground-truth attack classifications."
+    "n_estimators": 100
+  }
 }

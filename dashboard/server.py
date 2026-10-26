@@ -71,17 +71,18 @@ app = Flask(
 
 
 class VercelPathFixMiddleware:
-    """WSGI middleware to correctly set PATH_INFO when running behind Vercel or upstream reverse proxies.
-
-    When Vercel rewrites `/(.*)` to `/api/index`, Vercel invokes the function with PATH_INFO
-    set to `/api/index`. The client's true requested URI is forwarded in HTTP headers such as
-    `HTTP_X_FORWARDED_URI`, `HTTP_X_ORIGINAL_URI`, `HTTP_X_FORWARDED_PATH`, `RAW_URI`, or `REQUEST_URI`.
-    """
+    """WSGI middleware to correctly set PATH_INFO when running behind Vercel or upstream reverse proxies."""
 
     def __init__(self, wsgi_app):
         self.app = wsgi_app
 
     def __call__(self, environ, start_response):
+        # 1. If PATH_INFO already contains a specific route (native Vercel Flask preset), preserve it directly
+        current_path = environ.get("PATH_INFO", "")
+        if current_path and current_path not in ("/api/index", "/api/index.py"):
+            return self.app(environ, start_response)
+
+        # 2. Check proxy headers for original requested URI
         for header in (
             "HTTP_X_FORWARDED_URI",
             "HTTP_X_ORIGINAL_URI",
@@ -99,10 +100,6 @@ class VercelPathFixMiddleware:
                 else:
                     environ["PATH_INFO"] = raw_uri
                 break
-        else:
-            # Fallback: If PATH_INFO is literally '/api/index' or '/api/index.py' on a GET request
-            if environ.get("PATH_INFO") in ("/api/index", "/api/index.py") and environ.get("REQUEST_METHOD", "GET").upper() == "GET":
-                environ["PATH_INFO"] = "/"
 
         return self.app(environ, start_response)
 
@@ -154,6 +151,8 @@ def add_cors_headers(response):
 
 @app.route("/", methods=["GET"])
 @app.route("/index.html", methods=["GET"])
+@app.route("/api/index", methods=["GET"])
+@app.route("/api/index.py", methods=["GET"])
 def index():
     """Serve the single-page dashboard HTML application."""
     return send_from_directory(str(STATIC_DIR), "index.html")
@@ -335,6 +334,8 @@ def get_chart_data():
 
 
 @app.route("/api/ingest/csv", methods=["POST"])
+@app.route("/api/index", methods=["POST"])
+@app.route("/api/index.py", methods=["POST"])
 def ingest_csv():
     """Batch-ingest an uploaded CSV file, validate 66 features, run inference, and persist alerts."""
     if "file" not in request.files:
@@ -597,6 +598,7 @@ def export_alerts_csv():
 
 
 @app.route("/api/download/sample-csv", methods=["GET"])
+@app.route("/api/sample-csv", methods=["GET"])
 def download_sample_csv():
     """Download a verified 66-feature sample CSV datasheet for testing."""
     for cand in [

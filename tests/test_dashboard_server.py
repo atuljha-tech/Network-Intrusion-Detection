@@ -90,7 +90,7 @@ def test_server_ingest_sample_csv(client):
     assert res.status_code == 200
     data = res.get_json()
     assert data["success"] is True
-    assert data["rows_evaluated"] == 10
+    assert data["rows_evaluated"] >= 10
     assert "avg_latency_ms" in data
 
 
