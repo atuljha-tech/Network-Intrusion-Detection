@@ -628,6 +628,65 @@
       border: 1px solid rgba(0, 255, 102, 0.3);
     }
 
+    /* Inline Interactive Status Selector inside Table */
+    .term-status-select {
+      background: var(--bg-black);
+      border: 1px solid var(--border-bright);
+      color: var(--text-main);
+      padding: 3px 6px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      outline: none;
+      cursor: pointer;
+      border-radius: 0;
+      transition: all 0.15s ease;
+    }
+    .term-status-select:focus {
+      outline: none;
+      box-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
+    }
+    .term-status-select.tag-new {
+      background: var(--term-amber-dim);
+      color: var(--term-amber);
+      border: 1px solid rgba(255, 184, 0, 0.5);
+    }
+    .term-status-select.tag-investigating {
+      background: var(--term-cyan-dim);
+      color: var(--term-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.5);
+    }
+    .term-status-select.tag-confirmed {
+      background: var(--term-red-dim);
+      color: var(--term-red);
+      border: 1px solid rgba(255, 56, 85, 0.5);
+    }
+    .term-status-select.tag-false-positive {
+      background: rgba(139, 148, 158, 0.2);
+      color: #94a3b8;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+    .term-status-select.tag-resolved {
+      background: var(--term-green-dim);
+      color: var(--term-green);
+      border: 1px solid rgba(0, 255, 102, 0.5);
+    }
+    .term-status-select option {
+      background: #0d1117;
+      color: #e6edf3;
+      font-weight: 600;
+    }
+
+    /* Row highlight pulse when updated */
+    .row-flash {
+      animation: alertRowFlash 1.4s ease-out;
+    }
+    @keyframes alertRowFlash {
+      0% { background: rgba(0, 240, 255, 0.35) !important; }
+      100% { background: transparent; }
+    }
+
     /* Micro confidence bar */
     .term-conf-bar {
       display: inline-flex;
@@ -936,7 +995,7 @@
 
     <div class="term-topbar-right">
       <span id="term-clock" style="color: var(--text-muted); font-size: 11px;">UTC --:--:--</span>
-      <button class="term-btn" onclick="loadStats()">[ REFRESH ]</button>
+      <button class="term-btn" onclick="loadStats(true)">[ REFRESH ]</button>
     </div>
   </header>
 
@@ -1042,6 +1101,7 @@
             <a href="/api/download/sample-csv" download="sample_network_flows.csv" class="term-btn" title="Download the 250-row 66-feature sample dataset">[ DOWNLOAD SAMPLE CSV ]</a>
             <button class="term-btn" id="btn-load-sample-csv" onclick="loadSampleCSV()">[ LOAD SAMPLE CSV (250 ROWS) ]</button>
             <button class="term-btn" id="btn-load-sample-pcap" onclick="loadSamplePCAP()">[ LOAD SAMPLE PCAP ]</button>
+            <button class="term-btn" style="color: var(--term-cyan); border-color: rgba(0, 240, 255, 0.4);" onclick="document.getElementById('alerts-section').scrollIntoView({ behavior: 'smooth' })" title="Jump directly to the alert triage data grid">[ ↓ VIEW ALERT GRID ]</button>
             
             <select class="term-select" id="model-select">
               <option value="multiclass">PARADIGM: MULTICLASS (13 ATTACKS)</option>
@@ -1338,7 +1398,7 @@
     let chartsInitialized = false;
 
     document.addEventListener('DOMContentLoaded', () => {
-      loadStats();
+      loadStats(true);
       setupDragAndDrop();
       startClock();
     });
@@ -1486,7 +1546,105 @@
       }
     }
 
-    async function loadStats() {
+    async function updateKPIsOnly() {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        if (data && data.total_alerts > 0) {
+          const elTotal = document.getElementById('kpi-total');
+          if (elTotal) elTotal.textContent = data.total_alerts.toLocaleString();
+          const elBacklog = document.getElementById('kpi-backlog');
+          if (elBacklog) elBacklog.textContent = data.unresolved_count.toLocaleString();
+          const elConfirmed = document.getElementById('kpi-confirmed');
+          if (elConfirmed) elConfirmed.textContent = data.confirmed_count.toLocaleString();
+          const elAnom = document.getElementById('kpi-anomalies');
+          if (elAnom) elAnom.textContent = data.anomaly_count.toLocaleString();
+          const elLat = document.getElementById('kpi-latency');
+          if (elLat) elLat.textContent = `${data.avg_latency_ms.toFixed(1)} ms`;
+        }
+      } catch (err) {
+        console.warn('Failed to update KPIs:', err);
+      }
+    }
+
+    function getStatusClass(status) {
+      if (!status) return 'tag-new';
+      const s = String(status).toLowerCase();
+      if (s === 'investigating') return 'tag-investigating';
+      if (s === 'confirmed incident' || s === 'confirmed') return 'tag-confirmed';
+      if (s === 'false positive' || s === 'false_positive' || s === 'false pos') return 'tag-false-positive';
+      if (s === 'resolved') return 'tag-resolved';
+      return 'tag-new';
+    }
+
+    async function changeAlertStatusInline(alertId, newStatus, selectEl) {
+      if (!alertId || !newStatus) return;
+
+      const oldStatus = selectEl ? (selectEl.dataset.prevStatus || 'New') : 'New';
+      if (selectEl) {
+        selectEl.className = `term-status-select ${getStatusClass(newStatus)}`;
+        selectEl.dataset.prevStatus = newStatus;
+      }
+
+      // Optimistic lifecycle chart bar update
+      if (chartLifecycle && chartLifecycle.data && chartLifecycle.data.labels) {
+        const labels = chartLifecycle.data.labels.map(l => l.toUpperCase());
+        const normOld = (oldStatus === 'Confirmed Incident' ? 'CONFIRMED' : (oldStatus === 'False Positive' ? 'FALSE_POS' : oldStatus)).toUpperCase();
+        const normNew = (newStatus === 'Confirmed Incident' ? 'CONFIRMED' : (newStatus === 'False Positive' ? 'FALSE_POS' : newStatus)).toUpperCase();
+
+        const oldIdx = labels.findIndex(l => l === normOld || l.startsWith(normOld.slice(0, 4)));
+        const newIdx = labels.findIndex(l => l === normNew || l.startsWith(normNew.slice(0, 4)));
+
+        if (oldIdx !== -1 && chartLifecycle.data.datasets[0].data[oldIdx] > 0) {
+          chartLifecycle.data.datasets[0].data[oldIdx] -= 1;
+        }
+        if (newIdx !== -1) {
+          chartLifecycle.data.datasets[0].data[newIdx] = (chartLifecycle.data.datasets[0].data[newIdx] || 0) + 1;
+        }
+        chartLifecycle.update();
+      }
+
+      // Flash table row for visual feedback
+      const row = document.getElementById(`alert-row-${alertId}`);
+      if (row) {
+        row.classList.remove('row-flash');
+        void row.offsetWidth; // trigger reflow
+        row.classList.add('row-flash');
+      }
+
+      showToast(`Alert #${alertId} updated -> ${newStatus.toUpperCase()}`);
+
+      try {
+        const res = await fetch(`/api/alerts/${alertId}/status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          showToast(`ERROR: ${data.error || 'Failed to update status'}`);
+          if (selectEl) {
+            selectEl.value = oldStatus;
+            selectEl.className = `term-status-select ${getStatusClass(oldStatus)}`;
+            selectEl.dataset.prevStatus = oldStatus;
+          }
+          await updateCharts();
+        } else {
+          // Sync KPIs and charts with confirmed backend store without touching table DOM
+          await updateKPIsOnly();
+          await updateCharts();
+        }
+      } catch (err) {
+        showToast(`ERROR: ${err.message || 'Status update failed'}`);
+        if (selectEl) {
+          selectEl.value = oldStatus;
+          selectEl.className = `term-status-select ${getStatusClass(oldStatus)}`;
+          selectEl.dataset.prevStatus = oldStatus;
+        }
+      }
+    }
+
+    async function loadStats(refreshAlerts = false) {
       try {
         const res = await fetch('/api/stats');
         const data = await res.json();
@@ -1518,7 +1676,9 @@
           }
 
           updateCharts();
-          loadAlerts();
+          if (refreshAlerts) {
+            loadAlerts();
+          }
         }
       } catch (err) {
         console.error('Failed to load stats:', err);
@@ -1604,17 +1764,12 @@
           classBadge = `<span class="term-tag tag-anomaly">ANOMALY [BENIGN]</span>`;
         }
 
-        let statusClass = 'tag-new';
-        if (a.status === 'Investigating') statusClass = 'tag-investigating';
-        else if (a.status === 'Confirmed Incident') statusClass = 'tag-confirmed';
-        else if (a.status === 'False Positive') statusClass = 'tag-false-positive';
-        else if (a.status === 'Resolved') statusClass = 'tag-resolved';
-
+        const statusClass = getStatusClass(a.status);
         const conf = typeof a.confidence_score === 'number' ? (a.confidence_score * 100).toFixed(0) : '0';
         const anomScore = typeof a.anomaly_score === 'number' ? a.anomaly_score.toFixed(3) : '-';
 
         return `
-          <tr onclick="openModal(${a.id})">
+          <tr id="alert-row-${a.id}" onclick="openModal(${a.id})">
             <td>
               <div style="font-weight: 700; color: var(--term-cyan);">#${a.id}</div>
               <div style="color: var(--text-dim); font-size: 10px;">${(a.timestamp || '').replace('T', ' ').slice(0, 19)}</div>
@@ -1634,7 +1789,18 @@
               <span style="${isAnomaly ? 'color: var(--term-purple); font-weight: 700;' : 'color: var(--text-dim);'}">${anomScore}</span>
             </td>
             <td>
-              <span class="term-tag ${statusClass}">${(a.status || 'NEW').toUpperCase()}</span>
+              <select class="term-status-select ${statusClass}"
+                      id="status-select-${a.id}"
+                      data-prev-status="${a.status || 'New'}"
+                      onclick="event.stopPropagation()"
+                      onchange="changeAlertStatusInline(${a.id}, this.value, this)"
+                      title="Update alert lifecycle state directly in table">
+                <option value="New" ${a.status === 'New' ? 'selected' : ''}>NEW</option>
+                <option value="Investigating" ${a.status === 'Investigating' ? 'selected' : ''}>INVESTIGATING</option>
+                <option value="Confirmed Incident" ${a.status === 'Confirmed Incident' ? 'selected' : ''}>CONFIRMED</option>
+                <option value="False Positive" ${a.status === 'False Positive' ? 'selected' : ''}>FALSE POSITIVE</option>
+                <option value="Resolved" ${a.status === 'Resolved' ? 'selected' : ''}>RESOLVED</option>
+              </select>
             </td>
             <td>
               <button class="term-btn" style="padding: 2px 6px; font-size: 10px;" onclick="event.stopPropagation(); openModal(${a.id});">[ INSPECT ]</button>
@@ -1689,7 +1855,7 @@
             <div>[+] PERSISTENCE: <strong>${data.alerts_registered}</strong> threat alerts registered into SQLite database</div>
           `;
           updateVisibility(true);
-          await loadStats();
+          await loadStats(true);
           showToast(`Ingested & evaluated ${data.rows_evaluated} flows from sample CSV`);
         } else {
           feedback.innerHTML = `&gt;&gt; ERROR: ${data.detail || data.error || data.message || 'Inference execution failed.'}`;
@@ -1748,7 +1914,7 @@
             <div>[+] PERSISTENCE: <strong>${data.alerts_registered}</strong> alerts registered into SQLite database</div>
           `;
           updateVisibility(true);
-          await loadStats();
+          await loadStats(true);
           showToast(`Ingested PCAP: ${telem.flows_reconstructed || 0} flows reconstructed`);
         } else {
           feedback.innerHTML = `&gt;&gt; ERROR: ${data.detail || data.error || data.message || 'PCAP processing failed.'}`;
@@ -1811,7 +1977,7 @@
             <div>[+] PERSISTENCE: <strong>${data.alerts_registered || 0}</strong> threat alerts registered into SQLite alerts.db</div>
           `;
           updateVisibility(true);
-          await loadStats();
+          await loadStats(true);
           showToast(`Analysis complete: ${data.alerts_registered} alerts registered`);
         } else {
           let errDetail = data.message || data.error || data.detail || 'Ingestion execution error';
@@ -1837,7 +2003,7 @@
         if (data.success) {
           showToast('All alert records purged successfully');
           document.getElementById('ingest-feedback').style.display = 'none';
-          loadStats();
+          loadStats(true);
         }
       } catch (err) {
         showToast('ERROR: Failed to purge database');
@@ -1962,27 +2128,7 @@
         commitBtn.textContent = '[ COMMITTING... ]';
       }
 
-      // Optimistic update of table row badge in DOM for instantaneous feedback
-      try {
-        const rows = document.querySelectorAll('#alerts-tbody tr');
-        rows.forEach(tr => {
-          if (tr.innerHTML.includes(`#${targetAlertId}`)) {
-            let statusClass = 'tag-new';
-            if (status === 'Investigating') statusClass = 'tag-investigating';
-            else if (status === 'Confirmed Incident') statusClass = 'tag-confirmed';
-            else if (status === 'False Positive') statusClass = 'tag-false-positive';
-            else if (status === 'Resolved') statusClass = 'tag-resolved';
-
-            const badgeSpan = tr.querySelector('.term-tag.tag-new, .term-tag.tag-investigating, .term-tag.tag-confirmed, .term-tag.tag-false-positive, .term-tag.tag-resolved');
-            if (badgeSpan) {
-              badgeSpan.className = `term-tag ${statusClass}`;
-              badgeSpan.textContent = status.toUpperCase();
-            }
-          }
-        });
-      } catch (e) {
-        console.warn('Optimistic table update:', e);
-      }
+      const savedScrollY = window.scrollY;
 
       try {
         const res = await fetch(`/api/alerts/${targetAlertId}/status`, {
@@ -1994,20 +2140,30 @@
         if (res.ok && data.success) {
           if (commitBtn) commitBtn.textContent = '[ ✓ COMMITTED ]';
           showToast(`Alert #${targetAlertId} committed -> ${status.toUpperCase()}`);
-          setTimeout(closeModal, 300);
+          closeModal();
 
-          // Reset filters so the user sees all alert entries alongside the updated record!
-          const classEl = document.getElementById('filter-class');
-          if (classEl) classEl.value = 'All';
-          const statusEl = document.getElementById('filter-status');
-          if (statusEl) statusEl.value = 'All';
-          const searchEl = document.getElementById('filter-search');
-          if (searchEl) searchEl.value = '';
-          const anomEl = document.getElementById('filter-anomaly');
-          if (anomEl) anomEl.checked = false;
+          // Update inline status selector in the table row
+          const inlineSel = document.getElementById(`status-select-${targetAlertId}`);
+          if (inlineSel) {
+            inlineSel.value = status;
+            inlineSel.className = `term-status-select ${getStatusClass(status)}`;
+            inlineSel.dataset.prevStatus = status;
+          }
 
-          await loadStats();
-          await loadAlerts();
+          // Highlight the row with glow animation
+          const row = document.getElementById(`alert-row-${targetAlertId}`);
+          if (row) {
+            row.classList.remove('row-flash');
+            void row.offsetWidth;
+            row.classList.add('row-flash');
+          }
+
+          // Restore scroll position so viewport never jumps
+          window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+
+          // Refresh charts and KPIs immediately
+          await updateCharts();
+          await updateKPIsOnly();
         } else {
           showToast(`ERROR: ${data.error || 'Status update rejected'}`);
           if (commitBtn) {
@@ -2155,6 +2311,13 @@
           if (labels.length > 0 && values.length > 0) {
             chartLifecycle.data.labels = labels.map(l => String(l).toUpperCase());
             chartLifecycle.data.datasets[0].data = values;
+            chartLifecycle.data.datasets[0].backgroundColor = [
+              '#ffb800', // NEW
+              '#00f0ff', // INVESTIGATING
+              '#ff3855', // CONFIRMED INCIDENT
+              '#8b949e', // FALSE POSITIVE
+              '#00ff66'  // RESOLVED
+            ];
             chartLifecycle.update();
           }
         }
