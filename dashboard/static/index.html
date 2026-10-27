@@ -1177,6 +1177,17 @@
           <input type="checkbox" id="filter-anomaly" onchange="loadAlerts()">
           <span>OUTLIERS_ONLY</span>
         </label>
+
+        <button class="term-btn" id="btn-reset-filters" style="display: none; padding: 4px 10px; font-size: 10px; color: var(--term-amber); border-color: rgba(255, 184, 0, 0.4);" onclick="resetAllFilters()">[ RESET FILTERS ]</button>
+      </div>
+
+      <!-- Active Filter Banner (prevents accidental hidden alerts) -->
+      <div id="filter-active-banner" style="display: none; padding: 8px 12px; background: rgba(255, 184, 0, 0.08); border: 1px solid rgba(255, 184, 0, 0.3); margin-bottom: 12px; font-size: 11px; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="color: var(--term-amber); font-weight: 700;">[!] FILTER ACTIVE:</span>
+          <span id="filter-active-text" style="color: var(--text-main);"></span>
+        </div>
+        <button class="term-btn" style="padding: 2px 8px; font-size: 10px; color: var(--term-cyan); border-color: rgba(0, 240, 255, 0.4);" onclick="resetAllFilters()">[ SHOW ALL ALERTS ]</button>
       </div>
 
       <!-- Table -->
@@ -1491,14 +1502,20 @@
           document.getElementById('kpi-latency').textContent = `${data.avg_latency_ms.toFixed(1)} ms`;
 
           const classFilter = document.getElementById('filter-class');
-          const currentSelected = classFilter.value;
+          const currentSelected = classFilter ? classFilter.value : 'All';
           const classes = Object.keys(data.by_class || {});
           let html = '<option value="All">CLASS: ALL</option>';
           classes.forEach(c => {
             html += `<option value="${c}">${c.toUpperCase()}</option>`;
           });
-          classFilter.innerHTML = html;
-          if (currentSelected) classFilter.value = currentSelected;
+          if (classFilter) {
+            classFilter.innerHTML = html;
+            if (currentSelected && (currentSelected === 'All' || classes.includes(currentSelected))) {
+              classFilter.value = currentSelected;
+            } else {
+              classFilter.value = 'All';
+            }
+          }
 
           updateCharts();
           loadAlerts();
@@ -1508,11 +1525,30 @@
       }
     }
 
+    function resetAllFilters() {
+      const searchEl = document.getElementById('filter-search');
+      if (searchEl) searchEl.value = '';
+      const statusEl = document.getElementById('filter-status');
+      if (statusEl) statusEl.value = 'All';
+      const classEl = document.getElementById('filter-class');
+      if (classEl) classEl.value = 'All';
+      const anomEl = document.getElementById('filter-anomaly');
+      if (anomEl) anomEl.checked = false;
+      loadAlerts();
+    }
+
     async function loadAlerts() {
       const search = document.getElementById('filter-search').value.trim();
       const status = document.getElementById('filter-status').value;
       const predClass = document.getElementById('filter-class').value;
       const anomOnly = document.getElementById('filter-anomaly').checked;
+
+      const isFiltered = Boolean(search || (status && status !== 'All') || (predClass && predClass !== 'All') || anomOnly);
+      const resetBtn = document.getElementById('btn-reset-filters');
+      if (resetBtn) resetBtn.style.display = isFiltered ? 'inline-block' : 'none';
+
+      const banner = document.getElementById('filter-active-banner');
+      const bannerText = document.getElementById('filter-active-text');
 
       const params = new URLSearchParams();
       if (search) params.append('search', search);
@@ -1524,7 +1560,22 @@
       try {
         const res = await fetch(`/api/alerts?${params.toString()}`);
         const data = await res.json();
-        renderAlertsTable(data.alerts || []);
+        const alerts = data.alerts || [];
+        renderAlertsTable(alerts);
+
+        if (banner && bannerText) {
+          if (isFiltered) {
+            banner.style.display = 'flex';
+            let filterDesc = [];
+            if (predClass && predClass !== 'All') filterDesc.push(`Class: ${predClass.toUpperCase()}`);
+            if (status && status !== 'All') filterDesc.push(`Status: ${status.toUpperCase()}`);
+            if (search) filterDesc.push(`Grep: "${search}"`);
+            if (anomOnly) filterDesc.push('Outliers Only');
+            bannerText.textContent = `Showing ${alerts.length} matching alert(s) [${filterDesc.join(' // ')}].`;
+          } else {
+            banner.style.display = 'none';
+          }
+        }
       } catch (err) {
         console.error('Failed to load alerts:', err);
       }
@@ -1944,6 +1995,17 @@
           if (commitBtn) commitBtn.textContent = '[ ✓ COMMITTED ]';
           showToast(`Alert #${targetAlertId} committed -> ${status.toUpperCase()}`);
           setTimeout(closeModal, 300);
+
+          // Reset filters so the user sees all alert entries alongside the updated record!
+          const classEl = document.getElementById('filter-class');
+          if (classEl) classEl.value = 'All';
+          const statusEl = document.getElementById('filter-status');
+          if (statusEl) statusEl.value = 'All';
+          const searchEl = document.getElementById('filter-search');
+          if (searchEl) searchEl.value = '';
+          const anomEl = document.getElementById('filter-anomaly');
+          if (anomEl) anomEl.checked = false;
+
           await loadStats();
           await loadAlerts();
         } else {
