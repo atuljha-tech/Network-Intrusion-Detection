@@ -308,10 +308,25 @@ def update_alert_status(alert_id: int):
     new_status = payload.get("status")
     notes = payload.get("analyst_notes", "")
 
-    if not new_status or new_status not in ALERT_STATUS_CHOICES:
+    if not new_status:
+        return jsonify({"error": "Missing 'status' in JSON payload."}), 400
+
+    norm = str(new_status).strip().lower().replace("_", " ")
+    canonical_map = {
+        "new": "New",
+        "investigating": "Investigating",
+        "confirmed": "Confirmed Incident",
+        "confirmed incident": "Confirmed Incident",
+        "false positive": "False Positive",
+        "false pos": "False Positive",
+        "resolved": "Resolved",
+    }
+    canonical_status = canonical_map.get(norm, new_status)
+
+    if canonical_status not in ALERT_STATUS_CHOICES:
         return jsonify({"error": f"Invalid status '{new_status}'. Allowed: {ALERT_STATUS_CHOICES}"}), 400
 
-    updated = alert_mgr.update_alert_status(alert_id=alert_id, new_status=new_status, notes=notes)
+    updated = alert_mgr.update_alert_status(alert_id=alert_id, new_status=canonical_status, notes=notes)
     if not updated:
         return jsonify({"error": f"Alert #{alert_id} not found."}), 404
 

@@ -754,6 +754,136 @@
       gap: 10px;
     }
 
+    /* ── CSV Specification Box ─────────────────────────────────────────── */
+    .term-csv-spec {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border-dim);
+      border-left: 3px solid var(--term-cyan);
+      padding: 10px 14px;
+      margin-top: 10px;
+      margin-bottom: 12px;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+    .term-spec-header {
+      display: flex;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-dim);
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+      letter-spacing: 0.04em;
+    }
+    .term-spec-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .term-spec-item {
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+      color: var(--text-muted);
+    }
+    .term-spec-item strong {
+      color: var(--text-main);
+    }
+    .term-spec-item code {
+      color: var(--term-cyan);
+      background: rgba(0, 240, 255, 0.08);
+      padding: 1px 4px;
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      font-size: 10px;
+    }
+    .spec-label {
+      color: var(--term-cyan);
+      font-weight: 700;
+      white-space: nowrap;
+      min-width: 115px;
+      font-size: 10px;
+      letter-spacing: 0.05em;
+    }
+    .spec-text {
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    /* ── Interactive Lifecycle State Segmented Buttons ─────────────────── */
+    .term-lifecycle-btn-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 6px;
+      margin-top: 6px;
+      margin-bottom: 8px;
+    }
+    .term-state-btn {
+      padding: 8px 6px;
+      background: var(--bg-black);
+      border: 1px solid var(--border-bright);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      letter-spacing: 0.03em;
+      outline: none;
+    }
+    .term-state-btn:hover {
+      border-color: var(--text-main);
+      color: var(--text-main);
+    }
+    .term-state-btn .state-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .term-state-btn.state-new .state-dot { background: var(--term-amber); }
+    .term-state-btn.state-investigating .state-dot { background: var(--term-cyan); }
+    .term-state-btn.state-confirmed .state-dot { background: var(--term-red); }
+    .term-state-btn.state-false-positive .state-dot { background: #8b949e; }
+    .term-state-btn.state-resolved .state-dot { background: var(--term-green); }
+
+    .term-state-btn.active.state-new {
+      background: var(--term-amber-dim);
+      border-color: var(--term-amber);
+      color: var(--term-amber);
+      box-shadow: 0 0 10px rgba(255, 184, 0, 0.3);
+    }
+    .term-state-btn.active.state-investigating {
+      background: var(--term-cyan-dim);
+      border-color: var(--term-cyan);
+      color: var(--term-cyan);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+    }
+    .term-state-btn.active.state-confirmed {
+      background: var(--term-red-dim);
+      border-color: var(--term-red);
+      color: var(--term-red);
+      box-shadow: 0 0 10px rgba(255, 56, 85, 0.3);
+    }
+    .term-state-btn.active.state-false-positive {
+      background: rgba(139, 148, 158, 0.25);
+      border-color: #8b949e;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(139, 148, 158, 0.3);
+    }
+    .term-state-btn.active.state-resolved {
+      background: var(--term-green-dim);
+      border-color: var(--term-green);
+      color: var(--term-green);
+      box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
+    }
+
     /* ── Terminal Footer ───────────────────────────────────────────────── */
     .term-footer {
       background: var(--bg-surface);
@@ -859,6 +989,36 @@
             <span style="color: var(--term-green); font-weight: 700;">[ STAGED DATASET ]</span>
             <span id="csv-file-name" style="color: var(--text-main); font-weight: 600;"></span>
             <button class="term-btn term-btn-danger" style="padding: 2px 8px; font-size: 10px;" onclick="unstageFile(event, 'csv')">[ X UNSTAGE ]</button>
+          </div>
+        </div>
+
+        <!-- CSV Dataset Specification & Schema Guidelines -->
+        <div class="term-csv-spec" id="csv-spec-info">
+          <div class="term-spec-header">
+            <span style="color: var(--term-cyan); font-weight: 700;">// DATASET_SPECIFICATION:</span>
+            <span>ACCEPTED 66-FEATURE FLOW CSV SCHEMA &amp; INGESTION CRITERIA</span>
+          </div>
+          <div class="term-spec-grid">
+            <div class="term-spec-item">
+              <span class="spec-label">[ SCHEMA ]</span>
+              <span class="spec-text">Requires <strong>66 numeric bidirectional flow metrics</strong> modeled after the standard <strong>CIC-IDS2017</strong> benchmark specification.</span>
+            </div>
+            <div class="term-spec-item">
+              <span class="spec-label">[ METRICS ]</span>
+              <span class="spec-text">Evaluates header-level statistical aggregates: <em>flow_duration</em>, <em>packet length aggregates (mean, std, max)</em>, <em>flow rates (flow_bytes_s, flow_packets_s)</em>, <em>inter-arrival times (flow_iat_mean, std)</em>, <em>TCP flags (syn, ack, fin, rst, psh)</em>, and <em>window metrics (init_win_bytes_forward/backward)</em>.</span>
+            </div>
+            <div class="term-spec-item">
+              <span class="spec-label">[ SANITIZATION ]</span>
+              <span class="spec-text">Target/ground-truth columns (e.g. <code>label</code>, <code>class</code>, <code>is_malicious</code>) and socket headers are automatically identified and stripped before inference to strictly prevent data leakage.</span>
+            </div>
+            <div class="term-spec-item">
+              <span class="spec-label">[ PRIVACY ]</span>
+              <span class="spec-text">Strict passive Layer 3/4 flow metadata analysis. Zero packet application payload contents are ever inspected or stored.</span>
+            </div>
+            <div class="term-spec-item">
+              <span class="spec-label">[ QUICK TEST ]</span>
+              <span class="spec-text">Click <strong>[ DOWNLOAD SAMPLE CSV ]</strong> or <strong>[ LOAD SAMPLE CSV (250 ROWS) ]</strong> below to immediately test pipeline inference using a calibrated, schema-compliant sample flow datasheet.</span>
+            </div>
           </div>
         </div>
 
@@ -1078,6 +1238,16 @@
             <div class="dossier-label">MODEL_CONFIDENCE</div>
             <div class="dossier-val" id="m-conf">-</div>
           </div>
+          <div>
+            <div class="dossier-label">CURRENT_LIFECYCLE_STATE</div>
+            <div class="dossier-val" id="m-status-badge-container">
+              <span class="term-tag tag-new" id="m-status-badge">NEW</span>
+            </div>
+          </div>
+          <div>
+            <div class="dossier-label">ANOMALY_STATUS</div>
+            <div class="dossier-val" id="m-anomaly-badge">-</div>
+          </div>
         </div>
 
         <!-- XAI -->
@@ -1090,8 +1260,32 @@
 
         <!-- Status & Notes -->
         <div>
-          <div class="dossier-label">UPDATE LIFECYCLE STATE:</div>
-          <select class="term-select" id="m-status-select" style="width: 100%; margin-top: 4px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <div class="dossier-label">UPDATE LIFECYCLE STATE:</div>
+            <span id="m-status-staged-indicator" style="font-size: 10px; color: var(--term-cyan); font-weight: 700; letter-spacing: 0.04em;"></span>
+          </div>
+
+          <!-- Interactive Lifecycle State Segmented Buttons (Cyber Triage Control) -->
+          <div class="term-lifecycle-btn-group" id="lifecycle-btn-group">
+            <button type="button" class="term-state-btn state-new" data-status="New" onclick="selectLifecycleStatus('New')">
+              <span class="state-dot"></span>NEW
+            </button>
+            <button type="button" class="term-state-btn state-investigating" data-status="Investigating" onclick="selectLifecycleStatus('Investigating')">
+              <span class="state-dot"></span>INVESTIGATING
+            </button>
+            <button type="button" class="term-state-btn state-confirmed" data-status="Confirmed Incident" onclick="selectLifecycleStatus('Confirmed Incident')">
+              <span class="state-dot"></span>CONFIRMED
+            </button>
+            <button type="button" class="term-state-btn state-false-positive" data-status="False Positive" onclick="selectLifecycleStatus('False Positive')">
+              <span class="state-dot"></span>FALSE POSITIVE
+            </button>
+            <button type="button" class="term-state-btn state-resolved" data-status="Resolved" onclick="selectLifecycleStatus('Resolved')">
+              <span class="state-dot"></span>RESOLVED
+            </button>
+          </div>
+
+          <!-- Synced Select Dropdown for direct choice or keyboard fallback -->
+          <select class="term-select" id="m-status-select" style="width: 100%; margin-top: 4px; margin-bottom: 10px;" onchange="selectLifecycleStatus(this.value)">
             <option value="New">New (Unconfirmed Hypothesis)</option>
             <option value="Investigating">Investigating (Under Forensic Review)</option>
             <option value="Confirmed Incident">Confirmed Incident (Escalated Threat)</option>
@@ -1106,7 +1300,7 @@
 
       <div class="term-modal-footer">
         <button class="term-btn" onclick="closeModal()">[ CANCEL ]</button>
-        <button class="term-btn term-btn-primary" onclick="saveAlertStatus()">[ COMMIT STATUS ]</button>
+        <button class="term-btn term-btn-primary" id="m-btn-commit" onclick="saveAlertStatus()">[ COMMIT STATUS ]</button>
       </div>
     </div>
   </div>
@@ -1171,6 +1365,8 @@
       document.getElementById('tab-csv-btn').classList.toggle('active', mode === 'csv');
       document.getElementById('tab-pcap-btn').classList.toggle('active', mode === 'pcap');
       document.getElementById('dropzone-csv').style.display = mode === 'csv' ? 'block' : 'none';
+      const csvSpec = document.getElementById('csv-spec-info');
+      if (csvSpec) csvSpec.style.display = mode === 'csv' ? 'block' : 'none';
       document.getElementById('dropzone-pcap').style.display = mode === 'pcap' ? 'block' : 'none';
       if (!selectedFile && !stagedSampleType) {
         document.getElementById('ingest-status').textContent = 'READY';
@@ -1597,6 +1793,51 @@
       }
     }
 
+    function selectLifecycleStatus(status) {
+      if (!status) return;
+      const statusMap = {
+        'new': 'New',
+        'investigating': 'Investigating',
+        'confirmed': 'Confirmed Incident',
+        'confirmed incident': 'Confirmed Incident',
+        'false positive': 'False Positive',
+        'false_positive': 'False Positive',
+        'false pos': 'False Positive',
+        'resolved': 'Resolved'
+      };
+      const canonical = statusMap[status.toLowerCase()] || status;
+
+      // Sync select dropdown
+      const sel = document.getElementById('m-status-select');
+      if (sel) sel.value = canonical;
+
+      // Update interactive segmented buttons active state
+      const buttons = document.querySelectorAll('.term-state-btn');
+      buttons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.status === canonical);
+      });
+
+      // Update current status badge in dossier grid
+      const badge = document.getElementById('m-status-badge');
+      if (badge) {
+        let tagClass = 'tag-new';
+        if (canonical === 'Investigating') tagClass = 'tag-investigating';
+        else if (canonical === 'Confirmed Incident') tagClass = 'tag-confirmed';
+        else if (canonical === 'False Positive') tagClass = 'tag-false-positive';
+        else if (canonical === 'Resolved') tagClass = 'tag-resolved';
+
+        badge.className = `term-tag ${tagClass}`;
+        badge.textContent = canonical.toUpperCase();
+      }
+
+      // Update indicator and commit button
+      const ind = document.getElementById('m-status-staged-indicator');
+      if (ind) ind.textContent = `[ STAGED: ${canonical.toUpperCase()} ]`;
+
+      const commitBtn = document.getElementById('m-btn-commit');
+      if (commitBtn) commitBtn.textContent = `[ COMMIT STATUS: ${canonical.toUpperCase()} ]`;
+    }
+
     async function openModal(alertId) {
       currentSelectedAlertId = alertId;
       try {
@@ -1610,6 +1851,15 @@
         document.getElementById('m-proto').textContent = `${alert.protocol || 'IP'} [${alert.flow_id || '-'}]`;
         document.getElementById('m-class').textContent = (alert.predicted_class || 'UNKNOWN').toUpperCase();
         document.getElementById('m-conf').textContent = `${alert.confidence_score ? (alert.confidence_score * 100).toFixed(1) + '%' : '-'} (${alert.model_version || 'v1'})`;
+
+        const anomBadge = document.getElementById('m-anomaly-badge');
+        if (anomBadge) {
+          const isAnom = alert.is_anomaly === 1;
+          const score = typeof alert.anomaly_score === 'number' ? alert.anomaly_score.toFixed(3) : '-';
+          anomBadge.innerHTML = isAnom
+            ? `<span class="term-tag tag-anomaly">OUTLIER (${score})</span>`
+            : `<span style="color: var(--text-dim); font-size: 11px;">NORMAL (${score})</span>`;
+        }
 
         const xaiContainer = document.getElementById('m-xai-content');
         const parsed = alert.explanation_parsed;
@@ -1625,8 +1875,14 @@
           xaiContainer.innerHTML = `<div>No local feature attributions stored for this flow.</div>`;
         }
 
-        document.getElementById('m-status-select').value = alert.status || 'New';
+        selectLifecycleStatus(alert.status || 'New');
         document.getElementById('m-notes-input').value = alert.analyst_notes || '';
+
+        const commitBtn = document.getElementById('m-btn-commit');
+        if (commitBtn) {
+          commitBtn.disabled = false;
+          commitBtn.textContent = `[ COMMIT: ${(alert.status || 'NEW').toUpperCase()} ]`;
+        }
 
         document.getElementById('triage-modal').classList.add('active');
       } catch (err) {
@@ -1647,24 +1903,62 @@
       if (!currentSelectedAlertId) return;
       const status = document.getElementById('m-status-select').value;
       const notes = document.getElementById('m-notes-input').value.trim();
+      const commitBtn = document.getElementById('m-btn-commit');
+      const targetAlertId = currentSelectedAlertId;
+
+      if (commitBtn) {
+        commitBtn.disabled = true;
+        commitBtn.textContent = '[ COMMITTING... ]';
+      }
+
+      // Optimistic update of table row badge in DOM for instantaneous feedback
+      try {
+        const rows = document.querySelectorAll('#alerts-tbody tr');
+        rows.forEach(tr => {
+          if (tr.innerHTML.includes(`#${targetAlertId}`)) {
+            let statusClass = 'tag-new';
+            if (status === 'Investigating') statusClass = 'tag-investigating';
+            else if (status === 'Confirmed Incident') statusClass = 'tag-confirmed';
+            else if (status === 'False Positive') statusClass = 'tag-false-positive';
+            else if (status === 'Resolved') statusClass = 'tag-resolved';
+
+            const badgeSpan = tr.querySelector('.term-tag.tag-new, .term-tag.tag-investigating, .term-tag.tag-confirmed, .term-tag.tag-false-positive, .term-tag.tag-resolved');
+            if (badgeSpan) {
+              badgeSpan.className = `term-tag ${statusClass}`;
+              badgeSpan.textContent = status.toUpperCase();
+            }
+          }
+        });
+      } catch (e) {
+        console.warn('Optimistic table update:', e);
+      }
 
       try {
-        const res = await fetch(`/api/alerts/${currentSelectedAlertId}/status`, {
+        const res = await fetch(`/api/alerts/${targetAlertId}/status`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: status, analyst_notes: notes })
         });
         const data = await res.json();
-        if (data.success) {
-          showToast(`Alert #${currentSelectedAlertId} committed -> ${status}`);
-          closeModal();
-          loadStats();
-          loadAlerts();
+        if (res.ok && data.success) {
+          if (commitBtn) commitBtn.textContent = '[ ✓ COMMITTED ]';
+          showToast(`Alert #${targetAlertId} committed -> ${status.toUpperCase()}`);
+          setTimeout(closeModal, 300);
+          await loadStats();
+          await loadAlerts();
         } else {
-          showToast('ERROR: Status update rejected');
+          showToast(`ERROR: ${data.error || 'Status update rejected'}`);
+          if (commitBtn) {
+            commitBtn.disabled = false;
+            commitBtn.textContent = `[ COMMIT: ${status.toUpperCase()} ]`;
+          }
         }
       } catch (err) {
-        showToast('ERROR: Failed to save status');
+        showToast(`ERROR: Failed to save status (${err.message || err})`);
+        if (commitBtn) {
+          commitBtn.disabled = false;
+          commitBtn.textContent = `[ COMMIT: ${status.toUpperCase()} ]`;
+        }
       }
     }
 

@@ -447,7 +447,19 @@ class AlertManager:
         -------
         bool : True if alert was found and updated, False otherwise.
         """
-        if new_status not in ALERT_STATUS_CHOICES:
+        norm = str(new_status).strip().lower().replace("_", " ")
+        canonical_map = {
+            "new": "New",
+            "investigating": "Investigating",
+            "confirmed": "Confirmed Incident",
+            "confirmed incident": "Confirmed Incident",
+            "false positive": "False Positive",
+            "false pos": "False Positive",
+            "resolved": "Resolved",
+        }
+        if norm in canonical_map:
+            new_status = canonical_map[norm]
+        elif new_status not in ALERT_STATUS_CHOICES:
             raise ValueError(
                 f"Invalid status '{new_status}'. Allowed choices: {ALERT_STATUS_CHOICES}"
             )
